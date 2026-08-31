@@ -1,0 +1,14 @@
+# dependencias
+**/node_modules
+
+# builds / artefatos
+front/dist
+back-node/out
+back-node/dist
+
+# versao de referencia em Rust/Tauri - nao versionada neste repo
+/back/
+
+# misc
+*.local
+.DS_Store

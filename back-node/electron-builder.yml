@@ -1,0 +1,26 @@
+appId: com.felipe.pomodoro
+productName: Pomodoro
+directories:
+  output: dist
+  buildResources: build
+files:
+  - out/**
+extraResources:
+  - from: resources/icon.png
+    to: icon.png
+asarUnpack:
+  - "**/*.node"
+linux:
+  target:
+    - AppImage
+    - deb
+  category: Utility
+  icon: resources/icon.png
+  maintainer: Felipe <fh27.95@gmail.com>
+  synopsis: Pomodoro com agenda e alarme
+win:
+  target:
+    - nsis
+mac:
+  target:
+    - dmg
