@@ -67,4 +67,25 @@ describe("generate", () => {
       expect(b[i].start.getTime()).toBe(b[i - 1].end.getTime());
     }
   });
+
+  it("extends the focus before a long break instead of a short break", () => {
+    const b = generate("2026-08-31", cfg);
+    const lunchIdx = b.findIndex((x) => x.kind === "long_break");
+    const before = b[lunchIdx - 1];
+    expect(before.kind).toBe("work");
+    expect(hm(before.start)).toBe("11:00");
+    expect(hm(before.end)).toBe("12:00"); // 60 min, no short break, no gap
+  });
+
+  it("extends the day's last focus to the end, no trailing short break", () => {
+    const b = generate("2026-08-31", cfg);
+    const last = b[b.length - 1];
+    expect(last.kind).toBe("work");
+    expect(hm(last.start)).toBe("17:00");
+    expect(hm(last.end)).toBe("18:00"); // 60 min
+    const trailingBreak = b.some(
+      (x) => x.kind === "short_break" && x.start.getTime() >= last.start.getTime()
+    );
+    expect(trailingBreak).toBe(false);
+  });
 });

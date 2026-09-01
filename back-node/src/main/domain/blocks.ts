@@ -138,18 +138,30 @@ export function generate(dateStr: string, cfg: DayConfig): GeneratedBlock[] {
         .sort((a, b) => a.getTime() - b.getTime())[0];
 
       const sbDur = sbOv?.durationMin ?? cfg.shortBreakMin;
-      let sbEnd = minDate(addMinutes(cursor, sbDur), dayEnd);
-      if (nextBreakStart) sbEnd = minDate(sbEnd, nextBreakStart);
-      if (sbEnd.getTime() > cursor.getTime()) {
+      if (sbDur > 0) {
+        const sbNaturalEnd = addMinutes(cursor, sbDur);
+        const boundary = minDate(nextBreakStart ?? dayEnd, dayEnd);
+
+        // If the short break would reach (or overrun) the next long break or the
+        // end of the day, drop it and hand those minutes to the focus instead --
+        // so the focus ends exactly on the boundary, with no gap.
+        if (sbNaturalEnd.getTime() >= boundary.getTime()) {
+          const lastFocus = out[out.length - 1];
+          if (lastFocus && lastFocus.kind === "work") lastFocus.end = boundary;
+          cursor = boundary;
+          if (boundary.getTime() >= dayEnd.getTime()) break;
+          continue; // fall through to the long break on the next iteration
+        }
+
         seqOf.short_break = sbSeq;
         out.push({
           kind: "short_break",
           seq: sbSeq,
           start: cursor,
-          end: sbEnd,
+          end: sbNaturalEnd,
           label: sbOv?.label ?? null,
         });
-        cursor = sbEnd;
+        cursor = sbNaturalEnd;
       }
     }
   }
