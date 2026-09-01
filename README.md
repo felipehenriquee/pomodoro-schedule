@@ -1,194 +1,132 @@
-# Pomodoro (agenda + alarme)
+# Pomodoro Schedule
 
-App desktop onde voce cadastra agendas recorrentes e recebe
-**alarme sonoro + notificacao** nas trocas de bloco do pomodoro.
+App desktop onde voce cadastra **agendas recorrentes** e recebe **alarme sonoro
++ notificacao** nas trocas de bloco do pomodoro.
 
-Exemplo de agenda: `seg-sex, 09:00-18:00, 50 min de foco, 10 min de pausa,
-pausa longa 12:00-14:00`. Como `50 + 10 = 60`, o alarme cai sempre no
-minuto `:50` (fim do foco) e no `:00` (volta ao foco).
+Exemplo de agenda: `seg-sex, 08:00-18:00, 50 min de foco, 10 min de pausa, pausa
+longa 12:00-14:00`. Como `50 + 10 = 60`, o alarme cai sempre no minuto `:50`
+(fim do foco) e no `:00` (volta ao foco).
 
-## Estrutura
+## Stack
 
 ```
 pomodoro/
-├─ front/       React + Vite + TS + FullCalendar (UI, Web Audio) - compartilhado
-├─ back-node/   Electron + TypeScript + better-sqlite3  <-- versao ATIVA
-└─ back/        Tauri 2 / Rust  (mantida como referencia)
+├─ front/       React + Vite + TypeScript + FullCalendar (UI, Web Audio)
+└─ back-node/   Electron + TypeScript + better-sqlite3
 ```
 
-O `front/` detecta em runtime qual back esta rodando (`window.api` do Electron
-ou `invoke()` do Tauri), entao os dois continuam funcionando.
-
-## back-node (Electron) — rodar
-
-```bash
-# 1. deps
-cd front && npm install && npm run gen-sounds && cd ..
-cd back-node && npm install        # postinstall recompila o better-sqlite3 p/ Electron
-
-# 2. dev (sobe o Vite do front + a janela Electron)
-npm run dev            # dentro de back-node/
-
-# 3. instalador (.AppImage / .exe / .dmg)
-npm run package        # gera em back-node/dist/
-```
-
-- Domino (motor de blocos + recorrencia): `back-node/src/main/domain/` (com testes: `npm test`)
-- Camada de dados desacoplada: `back-node/src/main/db/repositories/` (interfaces em
-  `types.ts`, implementacao SQLite em `sqlite/`) — trocar de banco = nova pasta
-  implementando a mesma interface
-- Orquestracao (o que eram os commands): `back-node/src/main/services/agenda.ts`
-- Scheduler de alarmes: `back-node/src/main/scheduler.ts` (`setTimeout` no processo
-  main do Electron, nao sofre throttling)
-- IPC: `back-node/src/main/ipc.ts` (handlers) + `back-node/src/preload/index.ts`
-  (`window.api`)
-- Banco: `~/.config/Pomodoro/pomodoro.sqlite` (Linux) /
-  `%APPDATA%\Pomodoro\pomodoro.sqlite` (Windows). O usuario nao instala banco
-  nenhum — o arquivo e criado no primeiro uso.
-
-Pre-requisitos p/ empacotar no Linux: `build-essential` (ja instalado antes).
-Gerar `.exe` a partir do Linux exige buildar num Windows/CI (modulo nativo).
-
----
-
-## back (Tauri / Rust) — referencia
-
-Versao original em Rust, mantida como referencia. Os itens abaixo sao do Tauri.
-
-- `back/src/domain/blocks.rs`  — motor que gera os blocos do dia (com testes)
-- `back/src/domain/recurrence.rs` — recorrencia por dia da semana
-- `back/src/commands.rs` — API chamada pelo front via `invoke()`
-- `back/src/scheduler.rs` — tarefa de fundo que dispara evento + notificacao na borda
-- `back/migrations/` — schema SQLite
-- Banco: `~/.local/share/com.felipe.pomodoro/pomodoro.sqlite` (Linux) /
-  `%APPDATA%\com.felipe.pomodoro\` (Windows) — sobrevive a desligar o PC.
-
-## Pre-requisitos
-
-1. **Node** 18+ e **Rust** (via <https://rustup.rs>)
-2. **Tauri CLI**: `cargo install tauri-cli --version '^2'`
-3. **Libs de sistema (Linux/Ubuntu/Debian)**:
-   ```bash
-   sudo apt update && sudo apt install -y \
-     libwebkit2gtk-4.1-dev build-essential curl wget file \
-     libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
-   ```
-   (Windows: WebView2 — ja vem no Win10/11. macOS: Xcode Command Line Tools.)
+- `back/` guarda uma versao anterior do backend em **Rust/Tauri**, mantida so
+  como referencia (fora deste repo). Veja `back/TAURI.md`.
 
 ## Rodar em desenvolvimento
 
 ```bash
-# 1. deps do front + assets gerados
-cd front
-npm install
-npm run gen-sounds          # cria front/public/alarm-*.wav
-cd ..
-
-# 2. icone placeholder do app (uma vez)
-node back/scripts/gen-icon.mjs
-#    opcional: set completo de icones (ico/icns/tamanhos)
-#    cd back && cargo tauri icon icons/icon.png
-
-# 3. sobe tudo (Vite + janela Tauri)
-cd back
-cargo tauri dev
+cd front && npm install && npm run gen-sounds && cd ..
+cd back-node && npm install     # postinstall recompila o better-sqlite3 p/ Electron
+npm run dev                     # dentro de back-node/: sobe o Vite do front + a janela Electron
 ```
 
-O `cargo tauri dev` roda o `beforeDevCommand` (a partir da raiz do projeto,
-pasta acima de `back/`) que inicia o Vite em `localhost:1420` automaticamente.
+Rode sempre por um terminal normal, **nao pelo terminal integrado do VSCode**
+instalado via snap (ele injeta `LD_LIBRARY_PATH` do snap e quebra o Electron).
 
-## Empacotar (instalador nativo)
+## Gerar instalador
 
 ```bash
-cd back
-cargo tauri build
+cd back-node
+npm run package                 # -> back-node/dist/
 ```
 
-Gera `.deb`/`.AppImage` (Linux), `.msi`/`.exe` (Windows) ou `.dmg` (macOS)
-em `back/target/release/bundle/`.
+Linux: `.AppImage` (portavel) e `.deb` (`sudo apt install ./...deb`, instala em
+`/opt/Pomodoro/`). Gerar `.exe` (Windows) exige buildar num Windows/CI porque o
+`better-sqlite3` e modulo nativo.
+
+## Arquitetura do back-node
+
+| Peca | Onde |
+|---|---|
+| Dominio (motor de blocos + recorrencia), **com testes** (`npm test`) | `src/main/domain/` |
+| Camada de dados desacoplada (repository pattern) | `src/main/db/repositories/` — `types.ts` (interfaces) + `sqlite/` (impl). Trocar de banco = nova pasta com a mesma interface |
+| Orquestracao (materialize, updateBlock, createBlock, ...) | `src/main/services/agenda.ts` |
+| Scheduler de alarmes | `src/main/scheduler.ts` — `setTimeout` no processo main (nao sofre throttling; roda minimizado na bandeja) |
+| IPC | `src/main/ipc.ts` (`ipcMain.handle`) + `src/preload/index.ts` (`window.api`) + `src/channels.ts` |
+| Janela, bandeja, fechar-pra-bandeja, instancia unica | `src/main/index.ts` |
+
+Banco: `~/.config/Pomodoro/pomodoro.sqlite` (Linux) /
+`%APPDATA%\Pomodoro\pomodoro.sqlite` (Windows). Criado no primeiro uso; o
+usuario nao instala banco nenhum. Esquema aplicado por `user_version`
+(`src/main/db/schema.ts` + migrations em `db/index.ts`).
 
 ## Como funciona o alarme
 
-1. No primeiro uso, clique em **"Ativar som do alarme"** (navegadores exigem
-   um gesto pra liberar audio).
-2. O `scheduler` no backend dorme ate a proxima borda de bloco. Ao chegar:
-   - emite o evento `block-boundary` → o front toca `alarm-end.wav` (`:50`)
-     ou `alarm-start.wav` (`:00`);
-   - dispara uma **notificacao nativa** do SO;
-   - marca o bloco como concluido.
-3. **Fechar a janela = minimizar pra bandeja** (o processo segue vivo pra
-   continuar alarmando). Use o menu da bandeja → "Sair" pra encerrar de vez.
-4. Para o app subir junto com o PC, habilite o autostart (plugin ja incluso).
+O `scheduler` (processo main) dorme ate a proxima borda de bloco. Ao chegar:
 
-Troque os sons colocando seus proprios arquivos em `front/public/` com os
-mesmos nomes (`alarm-end.wav`, `alarm-start.wav`).
+1. emite `block-boundary` -> o renderer toca `alarm-end.wav` (`:50`) ou
+   `alarm-start.wav` (`:00`) via elemento `<audio>`;
+2. dispara a **notificacao nativa** do SO;
+3. marca o bloco como concluido.
 
-## Backup dos dados
+O som e liberado sem gesto do usuario (`webPreferences.autoplayPolicy`) e a
+preferencia (ligado/desligado) fica no `localStorage` (`pomodoro:soundOn`,
+default ligado) — abre ja no estado que voce deixou. Troque os sons colocando
+arquivos seus em `front/public/` com os mesmos nomes.
 
-Comandos `export_data` / `import_data` (JSON) ja existem no backend — falta
-so ligar um botao na UI. O arquivo `.sqlite` tambem pode ser copiado direto.
+**Fechar a janela = minimizar pra bandeja** (o app segue vivo alarmando). Menu
+da bandeja -> "Sair" pra encerrar. No GNOME o icone da bandeja precisa da
+extensao AppIndicator (o Ubuntu costuma ja trazer).
 
-## Frequencia da agenda
+## Agendas
 
-Ao criar: `Nao repetir` (uma data), `Todos os dias`, `Dias da semana` (toggles) ou
-`Intervalo de dias` (a cada N dias a partir de uma data). Guardado em
-`schedule_template.freq` / `anchor_date` / `interval_days`.
+Uma agenda (template) e permanente e recorrente — voce nunca recria.
 
-## Editar / excluir evento
+- Frequencia: `Nao repetir` (uma data), `Todos os dias`, `Dias da semana`
+  (toggles) ou `Intervalo de dias` (a cada N dias a partir de uma data).
+- Janela de validade opcional: `valido de` / `valido ate` (o "de" fica travado
+  ao editar).
+- O `materialize` mantem sempre ~120 dias a frente gerados (na criacao/edicao e
+  1x por dia pelo scheduler). Navegar no calendario carrega a semana visivel.
+- Header da Agenda: **"+ nova agenda"**, **"ver agendas"** (lista com editar /
+  excluir), botao de **saldo**, e **⋮** -> "excluir todos os eventos cancelados".
 
-Cada bloco tem um `seq` = posicao 1-based dentro do mesmo `kind` no dia
-(foco1, foco2, pausa1...). Tabela `block_slot(template_id, kind, seq)` guarda
-override de nome/duracao por posicao.
+### Editar agenda
 
-Clique num evento -> popover (ver / editar / excluir / fechar + pausar).
-"Ver"/"Editar" abrem a gaveta lateral: muda nome e horario; ao salvar escolhe:
+Salva de **hoje em diante** (passado nunca muda). Para cada dia futuro nao
+editado a mao: se ainda ocorre -> regenera com a config nova; se **deixou de
+ocorrer** (mudou a recorrencia/validade) -> os eventos que ainda nao comecaram
+viram **cancelados** (nao sao apagados), na cor `#CE2D4F`.
 
-- **so este evento**: muda so aquele bloco + empurra os seguintes do dia +
-  trava o dia (`day_agenda.locked = 1`, `materialize` nao regenera mais).
-- **todos os dias dessa agenda**: aplica **de hoje em diante** (dias passados
-  nunca sao alterados). Foco/pausa curta -> override em `block_slot`
-  (nome, `duration_min`, `offset_min` = atraso propagado). Pausa longa -> edita
-  a linha `long_break` do template. Depois regenera os dias >= hoje nao travados
-  e re-materializa ~90 dias. **Nunca** altera o nome da agenda.
+## Eventos
 
-Mudar o horario empurra os blocos seguintes do dia pela diferenca ("estaciona e
-recoloca" pra nao colidir no UNIQUE). Evento **em andamento**: o front bloqueia a
-edicao do horario (nome ainda pode).
+Cada bloco tem `seq` = posicao 1-based dentro do mesmo tipo no dia (foco1,
+foco2, pausa1...). `block_slot(template_id, kind, seq)` guarda override de
+nome / duracao / atraso por posicao.
+
+- **Criar** avulso: clique num horario do calendario. Se colidir, os eventos
+  seguintes do dia sao empurrados ("estaciona e recoloca" pra nao violar o
+  UNIQUE). Fica com `block.manual = 1` e trava o dia.
+- **Editar** (gaveta lateral): nome + horario. Ao salvar escolhe **so este
+  evento** ou **todos os dias dessa agenda**. Evento em andamento ou ja passado:
+  o horario fica bloqueado (nome ainda pode).
+- **Cancelar** (botao no popover, com confirmacao): evento de agenda vira
+  `status = 'skipped'` (da pra **retomar** depois); evento avulso e apagado.
+- **Excluir** um evento ja cancelado: apaga de vez (com confirmacao).
 
 ## Pausar / saldo de foco
 
-Botao "pausar" so aparece em eventos de **foco** (popover + tela de Foco).
-Nao mexe em horario; so nao toca o alarme enquanto pausado.
+Botao "pausar" em qualquer evento em andamento (tela de Foco e popover). Nao
+mexe em horario — so silencia o alarme enquanto pausado.
 
-O tempo somado em pausa vira um **saldo** (localStorage `pomodoro:debt:<data>`,
-zera a cada dia). Um botao no header da Agenda (ao lado de "nova agenda") mostra
-`saldo -MM:SS`. Quando a agenda do dia acaba (nada em andamento nem a seguir) e
-ha saldo, abre um modal "Ficaram X de foco em pausa, deseja fazer agora?":
-- **fazer agora** cria um bloco de foco de X comecando agora (empurra colisoes);
-- **zerar saldo** descarta;
-- **agora nao** mantem.
+O tempo pausado **enquanto o evento atual e foco** vira um **saldo**
+(`localStorage` `pomodoro:debt:<data>`, zera por dia). Pausa curta/longa nao
+conta. Botao de saldo no header; quando a agenda do dia acaba com saldo, abre um
+modal:
 
-## Criar evento na agenda
-
-Clique num horario do calendario -> modal "Novo evento": tipo (foco / pausa
-curta / pausa longa), nome, inicio e fim. Se colidir com eventos existentes do
-dia, os antigos sao empurrados em cadeia pra depois do novo terminar e a UI
-avisa. Evento avulso fica com `block.manual = 1` e trava o dia (`locked`).
-
-## Agendas (templates)
-
-- Header da Agenda: **"+ nova agenda"** e **"ver agendas"**.
-- "ver agendas" -> modal lista as agendas criadas (nome, frequencia, horario) com
-  botao de **editar** e **excluir**.
-- Editar uma agenda salva o template e **regenera os eventos futuros** dela
-  (`saveTemplate` com id chama `clearFutureUnlockedBlocks`); dias editados a mao
-  (`locked`) e dias passados nao mudam.
-- Excluir remove o template e, por FK `ON DELETE CASCADE`, todos os
-  `day_agenda` + `block` dele.
+- **fazer agora** — bloco de foco comecando agora;
+- **⋮** -> **adicionar ao fim do dia**, **escolher data + horario**, **zerar
+  saldo**;
+- **agora nao** — mantem.
 
 ## Ainda por fazer
 
-- Botao de export/import na UI
-- Toggle de autostart na UI
-- Marcar bloco como "pulado"
+- Botao de export/import (JSON) na UI — os comandos ja existem no back
+- Toggle de autostart no login
 - Estatisticas a partir de `session_log`
