@@ -1,9 +1,13 @@
+import { useTranslation } from "react-i18next";
+
 type Props = {
   checked: boolean;
   onChange: (checked: boolean) => void;
 };
 
 export function ActiveRow({ checked, onChange }: Props) {
+  const { t } = useTranslation();
+
   return (
     <label className="checkbox">
       <input
@@ -11,7 +15,7 @@ export function ActiveRow({ checked, onChange }: Props) {
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
       />
-      Agenda ativa
+      {t("templateForm.active")}
     </label>
   );
 }

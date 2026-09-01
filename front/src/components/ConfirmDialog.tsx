@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 type Props = {
   open: boolean;
   title: string;
@@ -17,6 +19,8 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: Props) {
+  const { t } = useTranslation();
+
   if (!open) return null;
   return (
     <div className="modal-overlay" onClick={onCancel}>
@@ -25,7 +29,7 @@ export function ConfirmDialog({
         <p>{message}</p>
         <div className="modal-actions">
           <button className="chip" onClick={onCancel}>
-            voltar
+            {t("confirmDialog.back")}
           </button>
           <button
             className={`chip solid ${danger ? "danger" : ""}`}

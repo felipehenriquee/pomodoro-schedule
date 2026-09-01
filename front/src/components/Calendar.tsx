@@ -1,14 +1,15 @@
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import { useTranslation } from "react-i18next";
 import { blockColors, cancelledColors } from "../lib/colors";
 import { isoDate } from "../lib/time";
 import type { Block, BlockKind } from "../models";
 
-const LABELS: Record<BlockKind, string> = {
-  work: "Foco",
-  short_break: "Pausa",
-  long_break: "Pausa longa",
+const KIND_KEY: Record<BlockKind, string> = {
+  work: "calendar.kind.work",
+  short_break: "calendar.kind.shortBreak",
+  long_break: "calendar.kind.longBreak",
 };
 
 type Props = {
@@ -24,11 +25,13 @@ export function Calendar({
   onDateClick,
   onRangeChange,
 }: Props) {
+  const { t, i18n } = useTranslation();
+
   return (
     <FullCalendar
       plugins={[timeGridPlugin, interactionPlugin]}
       initialView="timeGridWeek"
-      locale="pt-br"
+      locale={i18n.language === "en" ? "en" : "pt-br"}
       firstDay={1}
       nowIndicator
       allDaySlot={false}
@@ -62,7 +65,8 @@ export function Calendar({
         return {
           id: String(b.id),
           title:
-            (cancelled ? "(cancelado) " : "") + (b.label ?? LABELS[b.kind]),
+            (cancelled ? t("calendar.cancelledPrefix") : "") +
+            (b.label ?? t(KIND_KEY[b.kind])),
           start: b.start_ts,
           end: b.end_ts,
           backgroundColor: style.bg,

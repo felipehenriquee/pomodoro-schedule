@@ -1,6 +1,7 @@
+import { useTranslation } from "react-i18next";
 import { fmtWhen } from "../../lib/time";
 import { TaskList } from "../TaskList";
-import { KIND_LABEL, NTH_LABEL } from "./labels";
+import { useFocusLabels } from "./labels";
 import type { Block, BlockKind } from "../../models";
 
 type Props = {
@@ -13,13 +14,19 @@ type Props = {
  * event of that kind (any day), plus its task list when it's a focus block.
  */
 export function UpcomingPanel({ picked, upcoming }: Props) {
+  const { t } = useTranslation();
+  const { KIND_LABEL, NTH_LABEL } = useFocusLabels();
+
   return (
     <>
       <div className="event-meta">
         <div className="event-number">
           {upcoming
-            ? `em breve · ${upcoming.seq ?? 1}º ${NTH_LABEL[picked]} do dia`
-            : `sem ${NTH_LABEL[picked]} restante`}
+            ? t("focusView.nthOfDaySoon", {
+                n: upcoming.seq ?? 1,
+                kind: NTH_LABEL[picked],
+              })
+            : t("focusView.noneLeft", { kind: NTH_LABEL[picked] })}
         </div>
         <div className="event-name">
           {upcoming ? upcoming.label ?? KIND_LABEL[picked] : "—"}

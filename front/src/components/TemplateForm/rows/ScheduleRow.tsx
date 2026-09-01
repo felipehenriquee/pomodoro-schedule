@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { TemplateInput } from "../../../models";
 
 type SchedulePatch = Partial<Pick<TemplateInput, "start_time" | "end_time">>;
@@ -10,10 +11,12 @@ type Props = {
 
 /** Day window: "Início" / "Fim". */
 export function ScheduleRow({ startTime, endTime, onChange }: Props) {
+  const { t } = useTranslation();
+
   return (
     <div className="row">
       <label>
-        Início
+        {t("templateForm.start")}
         <input
           type="time"
           value={startTime}
@@ -21,7 +24,7 @@ export function ScheduleRow({ startTime, endTime, onChange }: Props) {
         />
       </label>
       <label>
-        Fim
+        {t("templateForm.end")}
         <input
           type="time"
           value={endTime}

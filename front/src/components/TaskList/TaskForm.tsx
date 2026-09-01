@@ -1,11 +1,13 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   onAdd: (text: string) => void | Promise<void>;
 };
 
-/** The add-task textarea + "adicionar a checklist". Owns its own draft. */
+/** The add-task textarea + "adicionar à checklist". Owns its own draft. */
 export function TaskForm({ onAdd }: Props) {
+  const { t } = useTranslation();
   const [text, setText] = useState("");
 
   async function submit() {
@@ -18,7 +20,7 @@ export function TaskForm({ onAdd }: Props) {
     <div className="task-form">
       <textarea
         autoFocus
-        placeholder="O que sera feito / o que foi feito..."
+        placeholder={t("tasks.placeholder")}
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={(e) => {
@@ -26,7 +28,7 @@ export function TaskForm({ onAdd }: Props) {
         }}
       />
       <button className="chip solid" onClick={submit} disabled={!text.trim()}>
-        adicionar a checklist
+        {t("tasks.addToChecklist")}
       </button>
     </div>
   );

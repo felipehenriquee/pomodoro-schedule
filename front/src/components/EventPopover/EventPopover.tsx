@@ -1,13 +1,8 @@
+import { useTranslation } from "react-i18next";
 import { PopoverHead } from "./PopoverHead";
 import { PopoverBody } from "./PopoverBody";
 import { PopoverRow } from "./PopoverRow";
 import type { Block, BlockKind } from "../../models";
-
-const KIND_LABEL: Record<BlockKind, string> = {
-  work: "Foco",
-  short_break: "Pausa curta",
-  long_break: "Pausa longa",
-};
 
 type Props = {
   block: Block;
@@ -34,6 +29,13 @@ export function EventPopover({
   onRestore,
   onClose,
 }: Props) {
+  const { t } = useTranslation();
+  const KIND_LABEL: Record<BlockKind, string> = {
+    work: t("common.kind.work"),
+    short_break: t("common.kind.shortBreak"),
+    long_break: t("common.kind.longBreak"),
+  };
+
   const left = Math.max(8, Math.min(x, window.innerWidth - 308));
   const top = Math.max(8, Math.min(y, window.innerHeight - 236));
   const name = block.label ?? KIND_LABEL[block.kind];

@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 type Props = {
   intervalDays: number | null;
   anchorDate: string | null;
@@ -14,10 +16,12 @@ export function FrequencyInterval({
   onChangeInterval,
   onChangeAnchor,
 }: Props) {
+  const { t } = useTranslation();
+
   return (
     <div className="row">
       <label>
-        A cada (dias)
+        {t("templateForm.everyDays")}
         <input
           type="number"
           min={1}
@@ -26,7 +30,7 @@ export function FrequencyInterval({
         />
       </label>
       <label>
-        A partir de
+        {t("templateForm.from")}
         <input
           type="date"
           min={min}

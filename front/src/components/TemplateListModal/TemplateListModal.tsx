@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Modal } from "../Modal";
 import { TemplateList } from "./TemplateList";
 import { templateService } from "../../services";
@@ -12,6 +13,7 @@ type Props = {
 };
 
 export function TemplateListModal({ open, onClose, onEdit, onChanged }: Props) {
+  const { t } = useTranslation();
   const [items, setItems] = useState<Template[]>([]);
   const [err, setErr] = useState<string | null>(null);
 
@@ -39,7 +41,7 @@ export function TemplateListModal({ open, onClose, onEdit, onChanged }: Props) {
   }
 
   return (
-    <Modal open={open} title="Agendas" size="md" onClose={onClose}>
+    <Modal open={open} title={t("templateList.title")} size="md" onClose={onClose}>
       {err && <p className="warn">{err}</p>}
       <TemplateList items={items} onEdit={onEdit} onRemove={remove} />
     </Modal>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { isoDate } from "../../lib/time";
 
 type Props = {
@@ -14,6 +15,7 @@ function tomorrow(): string {
 
 /** "escolher data" branch: date + time inputs, back / schedule. */
 export function PickerPanel({ onBack, onConfirm }: Props) {
+  const { t } = useTranslation();
   const [date, setDate] = useState(tomorrow);
   const [time, setTime] = useState("18:00");
 
@@ -21,7 +23,7 @@ export function PickerPanel({ onBack, onConfirm }: Props) {
     <div className="recover-panel from-right">
       <div className="recover-picker-row">
         <label>
-          Data
+          {t("recover.date")}
           <input
             type="date"
             min={isoDate(new Date())}
@@ -30,7 +32,7 @@ export function PickerPanel({ onBack, onConfirm }: Props) {
           />
         </label>
         <label>
-          Horário
+          {t("recover.time")}
           <input
             type="time"
             value={time}
@@ -40,14 +42,14 @@ export function PickerPanel({ onBack, onConfirm }: Props) {
       </div>
       <div className="modal-actions">
         <button className="chip" onClick={onBack}>
-          voltar
+          {t("recover.back")}
         </button>
         <button
           className="chip solid"
           disabled={!date || !time}
           onClick={() => onConfirm(date, time)}
         >
-          agendar
+          {t("recover.schedule")}
         </button>
       </div>
     </div>

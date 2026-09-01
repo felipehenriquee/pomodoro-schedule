@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { blockService, isDesktop } from "../../services";
 import { fmtDuration } from "../../lib/time";
 import { Icon } from "../Icon";
 import { FocusHeader } from "./FocusHeader";
 import { UpcomingPanel } from "./UpcomingPanel";
 import { CurrentPanel } from "./CurrentPanel";
-import { KIND_LABEL, NTH_LABEL } from "./labels";
+import { useFocusLabels } from "./labels";
 import type { Block, BlockKind, CurrentBlock } from "../../models";
 
 const MODES: BlockKind[] = ["work", "short_break", "long_break"];
@@ -27,13 +28,15 @@ export function FocusView({
   onTogglePause,
   onOpenAgenda,
 }: Props) {
+  const { t } = useTranslation();
+  const { KIND_LABEL, NTH_LABEL } = useFocusLabels();
   const [now, setNow] = useState(() => Date.now());
   const [picked, setPicked] = useState<BlockKind | null>(null);
   const [upcoming, setUpcoming] = useState<Block | null>(null);
 
   useEffect(() => {
-    const t = window.setInterval(() => setNow(Date.now()), 250);
-    return () => window.clearInterval(t);
+    const id = window.setInterval(() => setNow(Date.now()), 250);
+    return () => window.clearInterval(id);
   }, []);
 
   const cur = current?.current ?? null;
@@ -64,10 +67,11 @@ export function FocusView({
   // "Nº <kind> do dia" label for the current event (or the next one if none)
   const metaRef = cur ?? current?.next ?? null;
   const metaText = metaRef
-    ? `${metaRef.seq ?? 1}º ${NTH_LABEL[metaRef.kind]} do dia${
-        cur ? "" : " (a seguir)"
-      }`
-    : "sem evento agora";
+    ? t("focusView.nthOfDay", {
+        n: metaRef.seq ?? 1,
+        kind: NTH_LABEL[metaRef.kind],
+      }) + (cur ? "" : ` ${t("focusView.next")}`)
+    : t("focusView.noEventNow");
 
   return (
     <div className="focus" data-kind={bgKind}>
@@ -93,13 +97,13 @@ export function FocusView({
 
           <div className="countdown">{cur ? fmtDuration(remaining) : "--:--"}</div>
           <div className="countdown-name">
-            {cur ? cur.label ?? KIND_LABEL[cur.kind] : "sem evento agora"}
+            {cur ? cur.label ?? KIND_LABEL[cur.kind] : t("focusView.noEventNow")}
           </div>
 
           {cur && (
             <button className="mode pause-btn" onClick={onTogglePause}>
               <Icon name={paused ? "play_arrow" : "pause"} size={18} />
-              {paused ? "retomar" : "pausar"}
+              {paused ? t("focusView.resume") : t("focusView.pause")}
             </button>
           )}
         </div>

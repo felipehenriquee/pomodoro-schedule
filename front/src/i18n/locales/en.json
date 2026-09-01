@@ -1,0 +1,216 @@
+{
+  "common": {
+    "close": "Close",
+    "kind": {
+      "work": "Focus",
+      "shortBreak": "Short break",
+      "longBreak": "Long break"
+    }
+  },
+  "agenda": {
+    "header": {
+      "newSchedule": "+ new schedule",
+      "viewSchedules": "view schedules",
+      "balanceTitle": "Paused focus balance",
+      "balance": "balance",
+      "goToFocus": "Go to Focus",
+      "soundOn": "Turn off alarm sound",
+      "soundOff": "Turn on alarm sound"
+    },
+    "menu": {
+      "more": "More options",
+      "clearCancelled": "delete all cancelled events"
+    },
+    "alerts": {
+      "notDesktop": "Running outside the desktop app: the calendar and the alarm only work in the app (Electron/Tauri), not in plain <0>npm run dev</0>.",
+      "loadError": "Error loading blocks: {{error}}"
+    },
+    "confirm": {
+      "deleteTitle": "Delete event",
+      "cancelTitle": "Cancel event",
+      "deleteMessage": "This permanently deletes the event. It can't be undone.",
+      "cancelMessage": "The event is marked as cancelled. You can restore it later.",
+      "deleteConfirm": "delete",
+      "cancelConfirm": "cancel event",
+      "clearTitle": "Delete cancelled events",
+      "clearMessage": "Permanently deletes every event marked as cancelled. It can't be undone.",
+      "clearConfirm": "delete all"
+    }
+  },
+  "eventCreate": {
+    "modalTitle": "New event",
+    "conflictNotice": "There was a time clash: the earlier event(s) will run after this one ends.",
+    "ok": "ok",
+    "kind": {
+      "label": "Type"
+    },
+    "name": "Name",
+    "start": "Start",
+    "end": "End",
+    "endBeforeStart": "The end must be after the start.",
+    "submit": "create event"
+  },
+  "eventPopover": {
+    "cancelled": "Cancelled",
+    "view": "View",
+    "edit": "Edit",
+    "close": "Close",
+    "restore": "restore",
+    "delete": "delete",
+    "cancelEvent": "cancel event",
+    "resumeAlarm": "resume alarm",
+    "pauseAlarm": "pause alarm"
+  },
+  "focusView": {
+    "header": {
+      "soundOn": "sound on",
+      "soundOff": "turn on sound",
+      "viewAgenda": "view agenda"
+    },
+    "mode": {
+      "work": "Pomodoro",
+      "shortBreak": "Short break",
+      "longBreak": "Long break"
+    },
+    "nth": {
+      "work": "focus",
+      "shortBreak": "short break",
+      "longBreak": "long break"
+    },
+    "noEventNow": "no event right now",
+    "pause": "pause",
+    "resume": "resume",
+    "next": "(next)",
+    "nthOfDay": "{{kind}} #{{n}} of the day",
+    "nthOfDaySoon": "coming up · {{kind}} #{{n}} of the day",
+    "noneLeft": "no {{kind}} left"
+  },
+  "recover": {
+    "title": "Paused focus time",
+    "body": "You have <strong>{{amount}}</strong> of paused focus. Do it now?",
+    "date": "Date",
+    "time": "Time",
+    "back": "back",
+    "schedule": "schedule",
+    "notNow": "not now",
+    "doNow": "do it now",
+    "moreOptions": "More options",
+    "endOfDay": "add to end of day",
+    "pickDate": "pick a date",
+    "clearBalance": "clear balance"
+  },
+  "tasks": {
+    "title": "Tasks",
+    "add": "+ task",
+    "cancel": "cancel",
+    "empty": "No tasks yet.",
+    "placeholder": "What will be done / what was done...",
+    "addToChecklist": "add to checklist",
+    "edit": "edit",
+    "remove": "remove",
+    "save": "save"
+  },
+  "templateForm": {
+    "name": "Name",
+    "frequency": "Frequency",
+    "freq": {
+      "once": "Don't repeat",
+      "daily": "Every day",
+      "weekly": "Days of the week",
+      "interval": "Interval of days"
+    },
+    "weekdaysLabel": "Days of the week",
+    "weekday": {
+      "MO": "Mon",
+      "TU": "Tue",
+      "WE": "Wed",
+      "TH": "Thu",
+      "FR": "Fri",
+      "SA": "Sat",
+      "SU": "Sun"
+    },
+    "date": "Date",
+    "everyDays": "Every (days)",
+    "from": "Starting from",
+    "validity": "Validity (optional)",
+    "validFrom": "Valid from",
+    "validUntil": "Valid until",
+    "validFromLocked": "can't change after it's created",
+    "start": "Start",
+    "end": "End",
+    "focusMin": "Focus (min)",
+    "shortBreakMin": "Short break (min, optional)",
+    "noShortBreak": "0 = no short break",
+    "longBreaks": "Long breaks",
+    "breakLabel": "label",
+    "removeLongBreak": "remove long break",
+    "addLongBreak": "+ long break",
+    "active": "Schedule active",
+    "saving": "Saving...",
+    "saveChanges": "Save changes",
+    "saveSchedule": "Save schedule",
+    "savedNew": "Schedule saved.",
+    "savedEdit": "Schedule updated. Future events regenerated.",
+    "saveError": "Error: {{error}}",
+    "defaults": {
+      "name": "Default week",
+      "lunch": "Lunch",
+      "break": "Break"
+    }
+  },
+  "templateList": {
+    "title": "Schedules",
+    "empty": "No schedules created yet.",
+    "inactive": "inactive",
+    "confirmDelete": "Delete?",
+    "no": "no",
+    "yes": "yes",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "calendar": {
+    "cancelledPrefix": "(cancelled) ",
+    "kind": {
+      "work": "Focus",
+      "shortBreak": "Break",
+      "longBreak": "Long break"
+    }
+  },
+  "confirmDialog": {
+    "back": "back"
+  },
+  "soundPrompt": {
+    "title": "A new event started",
+    "body": "The alarm sound is off. Turn it on now?",
+    "dismiss": "not now",
+    "activate": "turn on sound"
+  },
+  "templateModal": {
+    "newTitle": "New schedule",
+    "editTitle": "Edit schedule"
+  },
+  "timerHud": {
+    "idle": "No active block right now",
+    "next": "next: {{kind}}",
+    "kind": {
+      "work": "Focus",
+      "shortBreak": "Break",
+      "longBreak": "Long break"
+    }
+  },
+  "eventDrawer": {
+    "viewTitle": "Event",
+    "editTitle": "Edit event",
+    "name": "Name",
+    "start": "Start",
+    "end": "End",
+    "inProgressLocked": "Event in progress — the time can't be changed.",
+    "pastLocked": "Event already passed — the time can't be changed.",
+    "frequency": "Frequency",
+    "applyTo": "Apply to:",
+    "onlyThis": "only this event",
+    "allDays": "every day of this schedule",
+    "save": "save",
+    "endBeforeStart": "The end must be after the start."
+  }
+}

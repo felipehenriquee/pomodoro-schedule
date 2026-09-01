@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "../Icon";
 
 type Props = {
@@ -17,20 +18,21 @@ export function ButtonsPanel({
   onClear,
   onPick,
 }: Props) {
+  const { t } = useTranslation();
   const [more, setMore] = useState(false);
 
   return (
     <div className="recover-panel from-left">
       <div className="modal-actions">
         <button className="chip" onClick={onClose}>
-          agora não
+          {t("recover.notNow")}
         </button>
         <button className="chip solid" onClick={onDoNow}>
-          fazer agora
+          {t("recover.doNow")}
         </button>
         <button
           className="row-ico"
-          title="Mais opções"
+          title={t("recover.moreOptions")}
           aria-expanded={more}
           onClick={() => setMore((m) => !m)}
         >
@@ -41,13 +43,13 @@ export function ButtonsPanel({
       <div className={`recover-more ${more ? "open" : ""}`}>
         <div className="recover-more-inner">
           <button className="chip" onClick={onEndOfDay}>
-            adicionar ao fim do dia
+            {t("recover.endOfDay")}
           </button>
           <button className="chip" onClick={onPick}>
-            escolher data
+            {t("recover.pickDate")}
           </button>
           <button className="chip" onClick={onClear}>
-            zerar saldo
+            {t("recover.clearBalance")}
           </button>
         </div>
       </div>

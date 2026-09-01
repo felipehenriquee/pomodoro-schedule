@@ -1,0 +1,216 @@
+{
+  "common": {
+    "close": "Fechar",
+    "kind": {
+      "work": "Foco",
+      "shortBreak": "Pausa curta",
+      "longBreak": "Pausa longa"
+    }
+  },
+  "agenda": {
+    "header": {
+      "newSchedule": "+ nova agenda",
+      "viewSchedules": "ver agendas",
+      "balanceTitle": "Saldo de foco pausado",
+      "balance": "saldo",
+      "goToFocus": "Ir para o Foco",
+      "soundOn": "Desativar som do alarme",
+      "soundOff": "Ativar som do alarme"
+    },
+    "menu": {
+      "more": "Mais opções",
+      "clearCancelled": "excluir todos os eventos cancelados"
+    },
+    "alerts": {
+      "notDesktop": "Rodando fora do app desktop: o calendário e o alarme só funcionam no app (Electron/Tauri), não no <0>npm run dev</0> puro.",
+      "loadError": "Erro ao carregar blocos: {{error}}"
+    },
+    "confirm": {
+      "deleteTitle": "Excluir evento",
+      "cancelTitle": "Cancelar evento",
+      "deleteMessage": "Isso apaga o evento de vez. Não dá pra desfazer.",
+      "cancelMessage": "O evento fica marcado como cancelado. Você pode retomá-lo depois.",
+      "deleteConfirm": "excluir",
+      "cancelConfirm": "cancelar evento",
+      "clearTitle": "Excluir eventos cancelados",
+      "clearMessage": "Apaga de vez todos os eventos marcados como cancelados. Não dá pra desfazer.",
+      "clearConfirm": "excluir todos"
+    }
+  },
+  "eventCreate": {
+    "modalTitle": "Novo evento",
+    "conflictNotice": "Havia choque de horário: o(s) evento(s) anterior(es) serão feitos após o novo terminar.",
+    "ok": "ok",
+    "kind": {
+      "label": "Tipo"
+    },
+    "name": "Nome",
+    "start": "Início",
+    "end": "Fim",
+    "endBeforeStart": "O fim precisa ser depois do início.",
+    "submit": "criar evento"
+  },
+  "eventPopover": {
+    "cancelled": "Cancelado",
+    "view": "Visualizar",
+    "edit": "Editar",
+    "close": "Fechar",
+    "restore": "retomar",
+    "delete": "excluir",
+    "cancelEvent": "cancelar evento",
+    "resumeAlarm": "retomar alarme",
+    "pauseAlarm": "pausar alarme"
+  },
+  "focusView": {
+    "header": {
+      "soundOn": "som ligado",
+      "soundOff": "ativar som",
+      "viewAgenda": "ver agenda"
+    },
+    "mode": {
+      "work": "Pomodoro",
+      "shortBreak": "Descanso curto",
+      "longBreak": "Descanso longo"
+    },
+    "nth": {
+      "work": "foco",
+      "shortBreak": "descanso curto",
+      "longBreak": "descanso longo"
+    },
+    "noEventNow": "sem evento agora",
+    "pause": "pausar",
+    "resume": "retomar",
+    "next": "(a seguir)",
+    "nthOfDay": "{{n}}º {{kind}} do dia",
+    "nthOfDaySoon": "em breve · {{n}}º {{kind}} do dia",
+    "noneLeft": "sem {{kind}} restante"
+  },
+  "recover": {
+    "title": "Tempo de foco pausado",
+    "body": "Ficaram <strong>{{amount}}</strong> de foco em pausa. Deseja fazer agora?",
+    "date": "Data",
+    "time": "Horário",
+    "back": "voltar",
+    "schedule": "agendar",
+    "notNow": "agora não",
+    "doNow": "fazer agora",
+    "moreOptions": "Mais opções",
+    "endOfDay": "adicionar ao fim do dia",
+    "pickDate": "escolher data",
+    "clearBalance": "zerar saldo"
+  },
+  "tasks": {
+    "title": "Tarefas",
+    "add": "+ tarefa",
+    "cancel": "cancelar",
+    "empty": "Nenhuma tarefa ainda.",
+    "placeholder": "O que será feito / o que foi feito...",
+    "addToChecklist": "adicionar à checklist",
+    "edit": "editar",
+    "remove": "remover",
+    "save": "salvar"
+  },
+  "templateForm": {
+    "name": "Nome",
+    "frequency": "Frequência",
+    "freq": {
+      "once": "Não repetir",
+      "daily": "Todos os dias",
+      "weekly": "Dias da semana",
+      "interval": "Intervalo de dias"
+    },
+    "weekdaysLabel": "Dias da semana",
+    "weekday": {
+      "MO": "Seg",
+      "TU": "Ter",
+      "WE": "Qua",
+      "TH": "Qui",
+      "FR": "Sex",
+      "SA": "Sáb",
+      "SU": "Dom"
+    },
+    "date": "Data",
+    "everyDays": "A cada (dias)",
+    "from": "A partir de",
+    "validity": "Validade (opcional)",
+    "validFrom": "Válido de",
+    "validUntil": "Válido até",
+    "validFromLocked": "não pode mudar depois de criada",
+    "start": "Início",
+    "end": "Fim",
+    "focusMin": "Foco (min)",
+    "shortBreakMin": "Pausa curta (min, opcional)",
+    "noShortBreak": "0 = sem pausa curta",
+    "longBreaks": "Pausas longas",
+    "breakLabel": "rótulo",
+    "removeLongBreak": "remover pausa longa",
+    "addLongBreak": "+ pausa longa",
+    "active": "Agenda ativa",
+    "saving": "Salvando...",
+    "saveChanges": "Salvar alterações",
+    "saveSchedule": "Salvar agenda",
+    "savedNew": "Agenda salva.",
+    "savedEdit": "Agenda atualizada. Eventos futuros regenerados.",
+    "saveError": "Erro: {{error}}",
+    "defaults": {
+      "name": "Semana padrão",
+      "lunch": "Almoço",
+      "break": "Pausa"
+    }
+  },
+  "templateList": {
+    "title": "Agendas",
+    "empty": "Nenhuma agenda criada ainda.",
+    "inactive": "inativa",
+    "confirmDelete": "Excluir?",
+    "no": "não",
+    "yes": "sim",
+    "edit": "Editar",
+    "delete": "Excluir"
+  },
+  "calendar": {
+    "cancelledPrefix": "(cancelado) ",
+    "kind": {
+      "work": "Foco",
+      "shortBreak": "Pausa",
+      "longBreak": "Pausa longa"
+    }
+  },
+  "confirmDialog": {
+    "back": "voltar"
+  },
+  "soundPrompt": {
+    "title": "Um novo evento começou",
+    "body": "O som do alarme está desativado. Quer ativar agora?",
+    "dismiss": "agora não",
+    "activate": "ativar som"
+  },
+  "templateModal": {
+    "newTitle": "Nova agenda",
+    "editTitle": "Editar agenda"
+  },
+  "timerHud": {
+    "idle": "Sem bloco ativo agora",
+    "next": "a seguir: {{kind}}",
+    "kind": {
+      "work": "Foco",
+      "shortBreak": "Pausa",
+      "longBreak": "Pausa longa"
+    }
+  },
+  "eventDrawer": {
+    "viewTitle": "Evento",
+    "editTitle": "Editar evento",
+    "name": "Nome",
+    "start": "Início",
+    "end": "Fim",
+    "inProgressLocked": "Evento em andamento — o horário não pode ser alterado.",
+    "pastLocked": "Evento já passou — o horário não pode ser alterado.",
+    "frequency": "Frequência",
+    "applyTo": "Aplicar em:",
+    "onlyThis": "só este evento",
+    "allDays": "todos os dias dessa agenda",
+    "save": "salvar",
+    "endBeforeStart": "O fim precisa ser depois do início."
+  }
+}

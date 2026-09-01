@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { EventCreateForm, type EventFormValues } from "./EventCreateForm";
 import { Modal } from "../Modal";
 import { blockService } from "../../services";
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export function EventCreateModal({ date, onClose, onCreated }: Props) {
+  const { t } = useTranslation();
   const [notice, setNotice] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -35,9 +37,7 @@ export function EventCreateModal({ date, onClose, onCreated }: Props) {
       });
       onCreated();
       if (pushed) {
-        setNotice(
-          "Havia choque de horario: o(s) evento(s) anterior(es) serao feitos apos o novo terminar."
-        );
+        setNotice(t("eventCreate.conflictNotice"));
       } else {
         onClose();
       }
@@ -49,12 +49,12 @@ export function EventCreateModal({ date, onClose, onCreated }: Props) {
   }
 
   return (
-    <Modal title="Novo evento" size="md" onClose={onClose}>
+    <Modal title={t("eventCreate.modalTitle")} size="md" onClose={onClose}>
       {notice ? (
         <div className="tpl-form">
           <p className="form-msg">{notice}</p>
           <button className="chip solid" onClick={onClose}>
-            ok
+            {t("eventCreate.ok")}
           </button>
         </div>
       ) : (

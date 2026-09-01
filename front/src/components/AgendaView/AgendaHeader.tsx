@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "../Icon";
 import { TimerHud } from "../TimerHud";
+import { MoreOptionsMenu } from "./MoreOptionsMenu";
 import { fmtDuration } from "../../lib/time";
 import type { CurrentBlock } from "../../models";
 
@@ -27,7 +28,7 @@ export function AgendaHeader({
   onToggleSound,
   onOpenFocus,
 }: Props) {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <header>
@@ -35,56 +36,27 @@ export function AgendaHeader({
 
       <div className="header-right">
         <button className="chip" onClick={onNewTemplate}>
-          + nova agenda
+          {t("agenda.header.newSchedule")}
         </button>
         <button className="chip" onClick={onOpenList}>
-          ver agendas
+          {t("agenda.header.viewSchedules")}
         </button>
 
         <button
           className={`chip debt-chip ${debtMs > 1000 ? "on" : ""}`}
-          title="Saldo de foco pausado"
+          title={t("agenda.header.balanceTitle")}
           onClick={onOpenRecover}
         >
-          saldo &minus;{fmtDuration(debtMs)}
+          {t("agenda.header.balance")} &minus;{fmtDuration(debtMs)}
         </button>
 
-        <div className="header-menu-wrap">
-          <button
-            className="row-ico"
-            title="Mais opções"
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((v) => !v)}
-          >
-            <Icon name="more_vert" size={18} />
-          </button>
-          {menuOpen && (
-            <>
-              <div
-                className="menu-backdrop"
-                onClick={() => setMenuOpen(false)}
-              />
-              <div className="header-menu">
-                <button
-                  className="header-menu-item"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    onClearCancelled();
-                  }}
-                >
-                  <Icon name="delete" size={16} />
-                  excluir todos os eventos cancelados
-                </button>
-              </div>
-            </>
-          )}
-        </div>
+        <MoreOptionsMenu onClearCancelled={onClearCancelled} />
 
         <div
           className="hud-box"
           role="button"
           tabIndex={0}
-          title="Ir para o Foco"
+          title={t("agenda.header.goToFocus")}
           onClick={onOpenFocus}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") onOpenFocus();
@@ -93,7 +65,11 @@ export function AgendaHeader({
           <TimerHud data={current} />
           <button
             className="sound-toggle"
-            title={soundOn ? "Desativar som do alarme" : "Ativar som do alarme"}
+            title={
+              soundOn
+                ? t("agenda.header.soundOn")
+                : t("agenda.header.soundOff")
+            }
             onClick={(e) => {
               e.stopPropagation();
               onToggleSound();

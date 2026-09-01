@@ -1,4 +1,5 @@
-import { KINDS } from "./kinds";
+import { useTranslation } from "react-i18next";
+import { useKinds } from "./kinds";
 import type { BlockKind } from "../../models";
 
 type Props = {
@@ -8,11 +9,14 @@ type Props = {
 
 /** The "Tipo" selector: Foco / Pausa curta / Pausa longa. */
 export function KindPicker({ value, onChange }: Props) {
+  const { t } = useTranslation();
+  const kinds = useKinds();
+
   return (
     <div className="field">
-      <span className="field-label">Tipo</span>
+      <span className="field-label">{t("eventCreate.kind.label")}</span>
       <div className="days">
-        {KINDS.map((k) => (
+        {kinds.map((k) => (
           <button
             type="button"
             key={k.key}

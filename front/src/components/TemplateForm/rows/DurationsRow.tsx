@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { TemplateInput } from "../../../models";
 
 type DurationsPatch = Partial<
@@ -12,10 +13,12 @@ type Props = {
 
 /** "Foco (min)" / "Pausa curta (min, opcional)". */
 export function DurationsRow({ workMin, shortBreakMin, onChange }: Props) {
+  const { t } = useTranslation();
+
   return (
     <div className="row">
       <label>
-        Foco (min)
+        {t("templateForm.focusMin")}
         <input
           type="number"
           min={1}
@@ -24,12 +27,12 @@ export function DurationsRow({ workMin, shortBreakMin, onChange }: Props) {
         />
       </label>
       <label>
-        Pausa curta (min, opcional)
+        {t("templateForm.shortBreakMin")}
         <input
           type="number"
           min={0}
           value={shortBreakMin}
-          placeholder="0 = sem pausa curta"
+          placeholder={t("templateForm.noShortBreak")}
           onChange={(e) =>
             onChange({ short_break_min: Number(e.target.value) || 0 })
           }

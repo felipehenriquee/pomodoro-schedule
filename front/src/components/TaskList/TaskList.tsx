@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useTasks } from "../../hooks/useTasks";
 import { TasksHead } from "./TasksHead";
 import { TaskForm } from "./TaskForm";
@@ -11,6 +12,7 @@ export function TaskList({
   dayAgendaId: number;
   seq: number;
 }) {
+  const { t } = useTranslation();
   const { tasks, add, update, toggle, remove } = useTasks(dayAgendaId, seq);
   const [open, setOpen] = useState(false);
 
@@ -38,7 +40,7 @@ export function TaskList({
           ))}
         </ul>
       ) : (
-        !open && <p className="tasks-empty">Nenhuma tarefa ainda.</p>
+        !open && <p className="tasks-empty">{t("tasks.empty")}</p>
       )}
     </div>
   );

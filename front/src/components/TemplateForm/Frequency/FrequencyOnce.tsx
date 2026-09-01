@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 type Props = {
   value: string | null;
   min: string;
@@ -6,9 +8,11 @@ type Props = {
 
 /** freq === "once": a single date. */
 export function FrequencyOnce({ value, min, onChange }: Props) {
+  const { t } = useTranslation();
+
   return (
     <label>
-      Data
+      {t("templateForm.date")}
       <input
         type="date"
         min={min}

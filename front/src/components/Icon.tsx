@@ -12,6 +12,7 @@ import PlayArrow from "~icons/material-symbols/play-arrow";
 import MoreVert from "~icons/material-symbols/more-vert";
 import History from "~icons/material-symbols/history";
 import Block from "~icons/material-symbols/block";
+import Translate from "~icons/material-symbols/translate";
 
 const ICONS = {
   notifications_active: NotificationsActive,
@@ -25,6 +26,7 @@ const ICONS = {
   more_vert: MoreVert,
   restore: History,
   block: Block,
+  translate: Translate,
 };
 
 export type IconName = keyof typeof ICONS;

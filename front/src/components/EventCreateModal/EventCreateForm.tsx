@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "../Icon";
 import { KindPicker } from "./KindPicker";
-import { KINDS } from "./kinds";
+import { useKinds } from "./kinds";
 import type { BlockKind } from "../../models";
 
 function hm(d: Date): string {
@@ -36,6 +37,8 @@ type Props = {
 };
 
 export function EventCreateForm({ date, saving, error, onSubmit }: Props) {
+  const { t } = useTranslation();
+  const kinds = useKinds();
   const [kind, setKind] = useState<BlockKind>("work");
   const [name, setName] = useState("");
   const [start, setStart] = useState(hm(date));
@@ -44,14 +47,14 @@ export function EventCreateForm({ date, saving, error, onSubmit }: Props) {
 
   function pickKind(k: BlockKind) {
     setKind(k);
-    const min = KINDS.find((x) => x.key === k)?.min ?? 30;
+    const min = kinds.find((x) => x.key === k)?.min ?? 30;
     setEnd(addMin(start, min));
   }
 
   function submit() {
     setLocalErr(null);
     if (toMin(end) <= toMin(start)) {
-      setLocalErr("O fim precisa ser depois do inicio.");
+      setLocalErr(t("eventCreate.endBeforeStart"));
       return;
     }
     onSubmit({ kind, name, start, end });
@@ -64,17 +67,17 @@ export function EventCreateForm({ date, saving, error, onSubmit }: Props) {
       <KindPicker value={kind} onChange={pickKind} />
 
       <label>
-        Nome
+        {t("eventCreate.name")}
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder={KINDS.find((k) => k.key === kind)?.label}
+          placeholder={kinds.find((k) => k.key === kind)?.label}
         />
       </label>
 
       <div className="row">
         <label>
-          Inicio
+          {t("eventCreate.start")}
           <input
             type="time"
             value={start}
@@ -82,7 +85,7 @@ export function EventCreateForm({ date, saving, error, onSubmit }: Props) {
           />
         </label>
         <label>
-          Fim
+          {t("eventCreate.end")}
           <input
             type="time"
             value={end}
@@ -100,7 +103,7 @@ export function EventCreateForm({ date, saving, error, onSubmit }: Props) {
         style={{ alignSelf: "flex-start" }}
       >
         <Icon name="edit" size={16} />
-        criar evento
+        {t("eventCreate.submit")}
       </button>
     </div>
   );

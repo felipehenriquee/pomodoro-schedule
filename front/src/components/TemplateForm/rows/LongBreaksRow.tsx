@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Icon } from "../../Icon";
 import type { LongBreakInput } from "../../../models";
 
@@ -8,18 +9,24 @@ type Props = {
 
 /** "Pausas longas": editable list of long breaks + add button. */
 export function LongBreaksRow({ value, onChange }: Props) {
+  const { t } = useTranslation();
+
   const update = (i: number, patch: Partial<LongBreakInput>) =>
     onChange(value.map((b, idx) => (idx === i ? { ...b, ...patch } : b)));
   const remove = (i: number) => onChange(value.filter((_, idx) => idx !== i));
   const add = () =>
     onChange([
       ...value,
-      { start_time: "12:00", end_time: "13:00", label: "Pausa" },
+      {
+        start_time: "12:00",
+        end_time: "13:00",
+        label: t("templateForm.defaults.break"),
+      },
     ]);
 
   return (
     <div className="lb-section">
-      <span className="field-label">Pausas longas</span>
+      <span className="field-label">{t("templateForm.longBreaks")}</span>
 
       {value.map((b, i) => (
         <div className="lb-item" key={i}>
@@ -27,12 +34,12 @@ export function LongBreaksRow({ value, onChange }: Props) {
             <input
               className="lb-label"
               value={b.label}
-              placeholder="rótulo"
+              placeholder={t("templateForm.breakLabel")}
               onChange={(e) => update(i, { label: e.target.value })}
             />
             <div className="row">
               <label>
-                Início
+                {t("templateForm.start")}
                 <input
                   type="time"
                   value={b.start_time}
@@ -40,7 +47,7 @@ export function LongBreaksRow({ value, onChange }: Props) {
                 />
               </label>
               <label>
-                Fim
+                {t("templateForm.end")}
                 <input
                   type="time"
                   value={b.end_time}
@@ -52,7 +59,7 @@ export function LongBreaksRow({ value, onChange }: Props) {
           <button
             type="button"
             className="row-ico lb-del"
-            title="remover pausa longa"
+            title={t("templateForm.removeLongBreak")}
             onClick={() => remove(i)}
           >
             <Icon name="delete" size={18} />
@@ -61,7 +68,7 @@ export function LongBreaksRow({ value, onChange }: Props) {
       ))}
 
       <button type="button" className="chip lb-add" onClick={add}>
-        + pausa longa
+        {t("templateForm.addLongBreak")}
       </button>
     </div>
   );

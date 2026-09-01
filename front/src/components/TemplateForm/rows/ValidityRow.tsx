@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { isoDate } from "../../../lib/time";
 import type { TemplateInput } from "../../../models";
 
@@ -27,19 +28,20 @@ export function ValidityRow({
   today,
   onChange,
 }: Props) {
+  const { t } = useTranslation();
   const minValidUntil = nextDay(validFrom ?? today);
 
   return (
     <div className="field">
-      <span className="field-label">Validade (opcional)</span>
+      <span className="field-label">{t("templateForm.validity")}</span>
       <div className="row">
         <label>
-          Válido de
+          {t("templateForm.validFrom")}
           <input
             type="date"
             min={today}
             disabled={editing}
-            title={editing ? "não pode mudar depois de criada" : undefined}
+            title={editing ? t("templateForm.validFromLocked") : undefined}
             value={validFrom ?? ""}
             onChange={(e) => {
               const v = e.target.value || null;
@@ -55,7 +57,7 @@ export function ValidityRow({
           />
         </label>
         <label>
-          Válido até
+          {t("templateForm.validUntil")}
           <input
             type="date"
             min={minValidUntil}

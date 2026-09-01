@@ -1,11 +1,10 @@
+import { useTranslation } from "react-i18next";
 import type { Weekday } from "../../../models";
 
-export const WEEKDAYS: { key: Weekday; label: string }[] = [
-  { key: "MO", label: "Seg" },
-  { key: "TU", label: "Ter" },
-  { key: "WE", label: "Qua" },
-  { key: "TH", label: "Qui" },
-  { key: "FR", label: "Sex" },
-  { key: "SA", label: "Sáb" },
-  { key: "SU", label: "Dom" },
-];
+const KEYS: Weekday[] = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
+
+/** The weekday buttons, with translated short labels ("Seg", "Ter", ...). */
+export function useWeekdays(): { key: Weekday; label: string }[] {
+  const { t } = useTranslation();
+  return KEYS.map((key) => ({ key, label: t(`templateForm.weekday.${key}`) }));
+}

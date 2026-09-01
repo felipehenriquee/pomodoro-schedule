@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { AgendaHeader } from "./AgendaHeader";
 import { Calendar } from "../Calendar";
 import { ConfirmDialog } from "../ConfirmDialog";
@@ -51,6 +52,7 @@ export function AgendaView({
   );
   const [confirmBlock, setConfirmBlock] = useState<Block | null>(null);
   const [confirmClear, setConfirmClear] = useState(false);
+  const { t } = useTranslation();
 
   function openEvent(id: number, x: number, y: number) {
     const block = blocks.find((b) => b.id === id);
@@ -93,11 +95,16 @@ export function AgendaView({
         <div className="agenda-alerts">
           {!isDesktop && (
             <p className="warn">
-              Rodando fora do app desktop: o calendario e o alarme so funcionam no
-              app (Electron/Tauri), nao no <code>npm run dev</code> puro.
+              <Trans i18nKey="agenda.alerts.notDesktop">
+                Rodando fora do app desktop: o calendário e o alarme só
+                funcionam no app (Electron/Tauri), não no{" "}
+                <code>npm run dev</code> puro.
+              </Trans>
             </p>
           )}
-          {error && <p className="warn">Erro ao carregar blocos: {error}</p>}
+          {error && (
+            <p className="warn">{t("agenda.alerts.loadError", { error })}</p>
+          )}
         </div>
         <div className="agenda-cal">
           <Calendar
@@ -169,16 +176,18 @@ export function AgendaView({
         danger
         title={
           confirmBlock?.status === "skipped"
-            ? "Excluir evento"
-            : "Cancelar evento"
+            ? t("agenda.confirm.deleteTitle")
+            : t("agenda.confirm.cancelTitle")
         }
         message={
           confirmBlock?.status === "skipped"
-            ? "Isso apaga o evento de vez. Não dá pra desfazer."
-            : "O evento fica marcado como cancelado. Você pode retomá-lo depois."
+            ? t("agenda.confirm.deleteMessage")
+            : t("agenda.confirm.cancelMessage")
         }
         confirmLabel={
-          confirmBlock?.status === "skipped" ? "excluir" : "cancelar evento"
+          confirmBlock?.status === "skipped"
+            ? t("agenda.confirm.deleteConfirm")
+            : t("agenda.confirm.cancelConfirm")
         }
         onConfirm={confirmDelete}
         onCancel={() => setConfirmBlock(null)}
@@ -187,9 +196,9 @@ export function AgendaView({
       <ConfirmDialog
         open={confirmClear}
         danger
-        title="Excluir eventos cancelados"
-        message="Apaga de vez todos os eventos marcados como cancelados. Não dá pra desfazer."
-        confirmLabel="excluir todos"
+        title={t("agenda.confirm.clearTitle")}
+        message={t("agenda.confirm.clearMessage")}
+        confirmLabel={t("agenda.confirm.clearConfirm")}
         onConfirm={async () => {
           await blockService.clearCancelled();
           setConfirmClear(false);

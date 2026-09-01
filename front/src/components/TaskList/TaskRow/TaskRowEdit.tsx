@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   initial: string;
@@ -8,6 +9,7 @@ type Props = {
 
 /** Edit mode: textarea seeded from `initial` + cancelar / salvar. */
 export function TaskRowEdit({ initial, onCancel, onSave }: Props) {
+  const { t } = useTranslation();
   const [draft, setDraft] = useState(initial);
 
   return (
@@ -19,14 +21,14 @@ export function TaskRowEdit({ initial, onCancel, onSave }: Props) {
       />
       <div className="task-edit-actions">
         <button className="chip" onClick={onCancel}>
-          cancelar
+          {t("tasks.cancel")}
         </button>
         <button
           className="chip solid"
           disabled={!draft.trim()}
           onClick={() => onSave(draft)}
         >
-          salvar
+          {t("tasks.save")}
         </button>
       </div>
     </li>

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Icon } from "../Icon";
 
 type Props = {
@@ -21,30 +22,32 @@ export function PopoverRow({
   onDelete,
   onTogglePause,
 }: Props) {
+  const { t } = useTranslation();
+
   return (
     <>
       {cancelled ? (
         <div className="event-popover-row">
           <button className="chip" onClick={onRestore}>
             <Icon name="restore" size={18} />
-            retomar
+            {t("eventPopover.restore")}
           </button>
           <button className="chip solid danger" onClick={onDelete}>
             <Icon name="delete" size={18} />
-            excluir
+            {t("eventPopover.delete")}
           </button>
         </div>
       ) : (
         <button className="chip pause-chip danger" onClick={onDelete}>
           <Icon name="block" size={18} />
-          cancelar evento
+          {t("eventPopover.cancelEvent")}
         </button>
       )}
 
       {canPause && (
         <button className="chip pause-chip" onClick={onTogglePause}>
           <Icon name={paused ? "play_arrow" : "pause"} size={18} />
-          {paused ? "retomar alarme" : "pausar alarme"}
+          {paused ? t("eventPopover.resumeAlarm") : t("eventPopover.pauseAlarm")}
         </button>
       )}
     </>

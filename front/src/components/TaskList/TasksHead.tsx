@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 type Props = {
   open: boolean;
   onToggle: () => void;
@@ -5,11 +7,13 @@ type Props = {
 
 /** "Tarefas" title + the add/cancel toggle button. */
 export function TasksHead({ open, onToggle }: Props) {
+  const { t } = useTranslation();
+
   return (
     <div className="tasks-head">
-      <h3>Tarefas</h3>
+      <h3>{t("tasks.title")}</h3>
       <button className="chip" onClick={onToggle}>
-        {open ? "cancelar" : "+ tarefa"}
+        {open ? t("tasks.cancel") : t("tasks.add")}
       </button>
     </div>
   );

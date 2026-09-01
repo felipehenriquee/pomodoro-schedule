@@ -1,4 +1,5 @@
-import { FREQS } from "./options";
+import { useTranslation } from "react-i18next";
+import { useFreqOptions } from "./options";
 import { FrequencyWeekly } from "./FrequencyWeekly";
 import { FrequencyOnce } from "./FrequencyOnce";
 import { FrequencyInterval } from "./FrequencyInterval";
@@ -27,6 +28,9 @@ export function Frequency({
   today,
   onChange,
 }: Props) {
+  const { t } = useTranslation();
+  const freqOptions = useFreqOptions();
+
   function selectFreq(next: Freq) {
     onChange({
       freq: next,
@@ -41,12 +45,12 @@ export function Frequency({
   return (
     <>
       <label>
-        Frequência
+        {t("templateForm.frequency")}
         <select
           value={freq}
           onChange={(e) => selectFreq(e.target.value as Freq)}
         >
-          {FREQS.map((f) => (
+          {freqOptions.map((f) => (
             <option key={f.key} value={f.key}>
               {f.label}
             </option>

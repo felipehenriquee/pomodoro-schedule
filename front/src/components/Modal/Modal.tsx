@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 export type ModalSize = "sm" | "md";
 
@@ -24,6 +25,8 @@ export function Modal({
   size = "sm",
   children,
 }: Props) {
+  const { t } = useTranslation();
+
   if (!open) return null;
 
   return (
@@ -34,7 +37,11 @@ export function Modal({
       >
         <div className="modal-head">
           <h3>{title}</h3>
-          <button className="modal-close" onClick={onClose} title="Fechar">
+          <button
+            className="modal-close"
+            onClick={onClose}
+            title={t("common.close")}
+          >
             {"✕"}
           </button>
         </div>

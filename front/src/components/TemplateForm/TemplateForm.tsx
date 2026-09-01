@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { templateService } from "../../services";
 import { isoDate } from "../../lib/time";
 import { Frequency } from "./Frequency";
@@ -10,30 +11,38 @@ import { LongBreaksRow } from "./rows/LongBreaksRow";
 import { ActiveRow } from "./rows/ActiveRow";
 import type { TemplateInput } from "../../models";
 
-const INITIAL: TemplateInput = {
-  name: "Semana padrão",
-  days_of_week: ["MO", "TU", "WE", "TH", "FR"],
-  start_time: "08:00",
-  end_time: "18:00",
-  work_min: 50,
-  short_break_min: 10,
-  active: true,
-  freq: "weekly",
-  anchor_date: null,
-  interval_days: null,
-  valid_from: null,
-  valid_until: null,
-  long_breaks: [{ start_time: "12:00", end_time: "14:00", label: "Almoço" }],
-};
-
 type FormProps = {
   onSaved: () => void;
   initial?: TemplateInput;
 };
 
 export function TemplateForm({ onSaved, initial }: FormProps) {
+  const { t } = useTranslation();
   const editing = initial?.id != null;
-  const [form, setForm] = useState<TemplateInput>(initial ?? INITIAL);
+  const [form, setForm] = useState<TemplateInput>(
+    () =>
+      initial ?? {
+        name: t("templateForm.defaults.name"),
+        days_of_week: ["MO", "TU", "WE", "TH", "FR"],
+        start_time: "08:00",
+        end_time: "18:00",
+        work_min: 50,
+        short_break_min: 10,
+        active: true,
+        freq: "weekly",
+        anchor_date: null,
+        interval_days: null,
+        valid_from: null,
+        valid_until: null,
+        long_breaks: [
+          {
+            start_time: "12:00",
+            end_time: "14:00",
+            label: t("templateForm.defaults.lunch"),
+          },
+        ],
+      }
+  );
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
@@ -48,13 +57,11 @@ export function TemplateForm({ onSaved, initial }: FormProps) {
     try {
       await templateService.save(form);
       setMsg(
-        editing
-          ? "Agenda atualizada. Eventos futuros regenerados."
-          : "Agenda salva."
+        editing ? t("templateForm.savedEdit") : t("templateForm.savedNew")
       );
       onSaved();
     } catch (err) {
-      setMsg(`Erro: ${err}`);
+      setMsg(t("templateForm.saveError", { error: String(err) }));
     } finally {
       setSaving(false);
     }
@@ -102,10 +109,10 @@ export function TemplateForm({ onSaved, initial }: FormProps) {
 
       <button type="submit" disabled={saving}>
         {saving
-          ? "Salvando..."
+          ? t("templateForm.saving")
           : editing
-            ? "Salvar alterações"
-            : "Salvar agenda"}
+            ? t("templateForm.saveChanges")
+            : t("templateForm.saveSchedule")}
       </button>
       {msg && <p className="form-msg">{msg}</p>}
     </form>

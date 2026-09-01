@@ -1,5 +1,6 @@
+import { useTranslation } from "react-i18next";
 import { TaskList } from "../TaskList";
-import { KIND_LABEL } from "./labels";
+import { useFocusLabels } from "./labels";
 import type { Block } from "../../models";
 
 type Props = {
@@ -12,12 +13,15 @@ type Props = {
  * its task list when it's a focus block.
  */
 export function CurrentPanel({ cur, metaText }: Props) {
+  const { t } = useTranslation();
+  const { KIND_LABEL } = useFocusLabels();
+
   return (
     <>
       <div className="event-meta">
         <div className="event-number">{metaText}</div>
         <div className="event-name">
-          {cur ? cur.label ?? KIND_LABEL[cur.kind] : "sem evento agora"}
+          {cur ? cur.label ?? KIND_LABEL[cur.kind] : t("focusView.noEventNow")}
         </div>
       </div>
 

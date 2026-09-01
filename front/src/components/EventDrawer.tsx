@@ -1,15 +1,10 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "./Icon";
 import { TaskList } from "./TaskList";
 import { blockService } from "../services";
 import { fmtFullDate, fmtHM, freqLabel, localRfc3339 } from "../lib/time";
 import type { Block, BlockKind } from "../models";
-
-const KIND_LABEL: Record<BlockKind, string> = {
-  work: "Foco",
-  short_break: "Pausa curta",
-  long_break: "Pausa longa",
-};
 
 type Props = {
   block: Block;
@@ -19,6 +14,13 @@ type Props = {
 };
 
 export function EventDrawer({ block, readOnly = false, onClose, onSaved }: Props) {
+  const { t } = useTranslation();
+  const kindLabel: Record<BlockKind, string> = {
+    work: t("common.kind.work"),
+    short_break: t("common.kind.shortBreak"),
+    long_break: t("common.kind.longBreak"),
+  };
+
   const [name, setName] = useState(block.label ?? "");
   const [start, setStart] = useState(fmtHM(block.start_ts));
   const [end, setEnd] = useState(fmtHM(block.end_ts));
@@ -45,7 +47,7 @@ export function EventDrawer({ block, readOnly = false, onClose, onSaved }: Props
     const s = buildTs(block.start_ts, start);
     const e = buildTs(block.end_ts, end);
     if (e.getTime() <= s.getTime()) {
-      setErr("O fim precisa ser depois do inicio.");
+      setErr(t("eventDrawer.endBeforeStart"));
       setConfirming(false);
       return;
     }
@@ -73,26 +75,32 @@ export function EventDrawer({ block, readOnly = false, onClose, onSaved }: Props
       <div className="drawer-backdrop" onClick={onClose} />
       <aside className="drawer">
         <div className="drawer-head">
-          <h3>{readOnly ? "Evento" : "Editar evento"}</h3>
-          <button className="row-ico" title="Fechar" onClick={onClose}>
+          <h3>
+            {readOnly ? t("eventDrawer.viewTitle") : t("eventDrawer.editTitle")}
+          </h3>
+          <button
+            className="row-ico"
+            title={t("common.close")}
+            onClick={onClose}
+          >
             <Icon name="close" size={18} />
           </button>
         </div>
 
         <div className="drawer-body">
           <label className="drawer-field">
-            Nome
+            {t("eventDrawer.name")}
             <input
               value={name}
               disabled={readOnly}
               onChange={(e) => setName(e.target.value)}
-              placeholder={KIND_LABEL[block.kind]}
+              placeholder={kindLabel[block.kind]}
             />
           </label>
 
           <div className="row">
             <label className="drawer-field">
-              Inicio
+              {t("eventDrawer.start")}
               <input
                 type="time"
                 value={start}
@@ -101,7 +109,7 @@ export function EventDrawer({ block, readOnly = false, onClose, onSaved }: Props
               />
             </label>
             <label className="drawer-field">
-              Fim
+              {t("eventDrawer.end")}
               <input
                 type="time"
                 value={end}
@@ -113,15 +121,16 @@ export function EventDrawer({ block, readOnly = false, onClose, onSaved }: Props
 
           {!readOnly && (occurring || past) && (
             <p className="epr-dim">
-              {occurring ? "Evento em andamento" : "Evento ja passou"} &mdash; o
-              horario nao pode ser alterado.
+              {occurring
+                ? t("eventDrawer.inProgressLocked")
+                : t("eventDrawer.pastLocked")}
             </p>
           )}
 
           <div className="drawer-info">
             <div>{fmtFullDate(block.start_ts)}</div>
             <div className="epr-dim">
-              Frequencia:{" "}
+              {t("eventDrawer.frequency")}:{" "}
               {freqLabel(block.freq, block.days_of_week, block.interval_days)}
             </div>
           </div>
@@ -131,20 +140,20 @@ export function EventDrawer({ block, readOnly = false, onClose, onSaved }: Props
           {!readOnly &&
             (confirming ? (
               <div className="drawer-confirm">
-                <span>Aplicar em:</span>
+                <span>{t("eventDrawer.applyTo")}</span>
                 <button
                   className="chip"
                   disabled={saving}
                   onClick={() => save("one")}
                 >
-                  so este evento
+                  {t("eventDrawer.onlyThis")}
                 </button>
                 <button
                   className="chip solid"
                   disabled={saving}
                   onClick={() => save("all")}
                 >
-                  todos os dias dessa agenda
+                  {t("eventDrawer.allDays")}
                 </button>
               </div>
             ) : (
@@ -152,7 +161,7 @@ export function EventDrawer({ block, readOnly = false, onClose, onSaved }: Props
                 className="chip solid drawer-save"
                 onClick={() => setConfirming(true)}
               >
-                salvar
+                {t("eventDrawer.save")}
               </button>
             ))}
 

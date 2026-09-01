@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Icon } from "../Icon";
 
 type Props = {
@@ -8,16 +9,20 @@ type Props = {
 
 /** Focus screen header: title + sound toggle + "ver agenda". */
 export function FocusHeader({ soundOn, onToggleSound, onOpenAgenda }: Props) {
+  const { t } = useTranslation();
+
   return (
     <header className="focus-header">
       <h1>Pomodoro</h1>
       <div className="focus-actions">
         <button className="ghost" onClick={onToggleSound}>
           <Icon name={soundOn ? "notifications_active" : "notifications_off"} />
-          {soundOn ? "som ligado" : "ativar som"}
+          {soundOn
+            ? t("focusView.header.soundOn")
+            : t("focusView.header.soundOff")}
         </button>
         <button className="ghost" onClick={onOpenAgenda}>
-          ver agenda
+          {t("focusView.header.viewAgenda")}
         </button>
       </div>
     </header>

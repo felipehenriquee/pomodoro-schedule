@@ -1,15 +1,21 @@
+import { Trans, useTranslation } from "react-i18next";
 import { fmtDuration } from "../../lib/time";
 
 type Props = { debtMs: number };
 
 /** Title + how much paused focus is pending. */
 export function RecoverHeader({ debtMs }: Props) {
+  const { t } = useTranslation();
+
   return (
     <>
-      <h3>Tempo de foco pausado</h3>
+      <h3>{t("recover.title")}</h3>
       <p>
-        Ficaram <strong>{fmtDuration(debtMs)}</strong> de foco em pausa. Deseja
-        fazer agora?
+        <Trans
+          i18nKey="recover.body"
+          values={{ amount: fmtDuration(debtMs) }}
+          components={{ strong: <strong /> }}
+        />
       </p>
     </>
   );

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Icon } from "../../Icon";
 import type { Task } from "../../../models";
 
@@ -10,6 +11,8 @@ type Props = {
 
 /** Read mode: checkbox + text + edit / remove icons. */
 export function TaskRowView({ task, onToggle, onEdit, onRemove }: Props) {
+  const { t } = useTranslation();
+
   return (
     <li className={task.done ? "done" : ""}>
       <input
@@ -18,10 +21,10 @@ export function TaskRowView({ task, onToggle, onEdit, onRemove }: Props) {
         onChange={(e) => onToggle(e.target.checked)}
       />
       <span>{task.text}</span>
-      <button className="row-ico" title="editar" onClick={onEdit}>
+      <button className="row-ico" title={t("tasks.edit")} onClick={onEdit}>
         <Icon name="edit" size={16} />
       </button>
-      <button className="row-ico" title="remover" onClick={onRemove}>
+      <button className="row-ico" title={t("tasks.remove")} onClick={onRemove}>
         <Icon name="delete" size={16} />
       </button>
     </li>
