@@ -1,16 +1,14 @@
 import { useState } from "react";
-import { Calendar } from "./Calendar";
-import { ConfirmDialog } from "./ConfirmDialog";
-import { EventCreateModal } from "./EventCreateModal";
-import { EventDrawer } from "./EventDrawer";
-import { EventPopover } from "./EventPopover";
-import { Icon } from "./Icon";
-import { TemplateListModal } from "./TemplateListModal";
-import { TemplateModal } from "./TemplateModal";
-import { TimerHud } from "./TimerHud";
-import { blockService, isDesktop, templateService } from "../services";
-import { fmtDuration } from "../lib/time";
-import type { Block, CurrentBlock, TemplateInput } from "../models";
+import { AgendaHeader } from "./AgendaHeader";
+import { Calendar } from "../Calendar";
+import { ConfirmDialog } from "../ConfirmDialog";
+import { EventCreateModal } from "../EventCreateModal";
+import { EventDrawer } from "../EventDrawer";
+import { EventPopover } from "../EventPopover";
+import { TemplateListModal } from "../TemplateListModal";
+import { TemplateModal } from "../TemplateModal";
+import { blockService, isDesktop, templateService } from "../../services";
+import type { Block, CurrentBlock, TemplateInput } from "../../models";
 
 type Props = {
   blocks: Block[];
@@ -52,7 +50,6 @@ export function AgendaView({
     null
   );
   const [confirmBlock, setConfirmBlock] = useState<Block | null>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
 
   function openEvent(id: number, x: number, y: number) {
@@ -80,80 +77,17 @@ export function AgendaView({
 
   return (
     <div className="app">
-      <header>
-        <h1>Pomodoro</h1>
-
-        <div className="header-right">
-          <button className="chip" onClick={() => setTplForm({ open: true })}>
-            + nova agenda
-          </button>
-          <button className="chip" onClick={() => setListOpen(true)}>
-            ver agendas
-          </button>
-
-          <button
-            className={`chip debt-chip ${debtMs > 1000 ? "on" : ""}`}
-            title="Saldo de foco pausado"
-            onClick={onOpenRecover}
-          >
-            saldo &minus;{fmtDuration(debtMs)}
-          </button>
-
-          <div className="header-menu-wrap">
-            <button
-              className="row-ico"
-              title="Mais opções"
-              aria-expanded={menuOpen}
-              onClick={() => setMenuOpen((v) => !v)}
-            >
-              <Icon name="more_vert" size={18} />
-            </button>
-            {menuOpen && (
-              <>
-                <div
-                  className="menu-backdrop"
-                  onClick={() => setMenuOpen(false)}
-                />
-                <div className="header-menu">
-                  <button
-                    className="header-menu-item"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      setConfirmClear(true);
-                    }}
-                  >
-                    <Icon name="delete" size={16} />
-                    excluir todos os eventos cancelados
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-
-          <div
-            className="hud-box"
-            role="button"
-            tabIndex={0}
-            title="Ir para o Foco"
-            onClick={onOpenFocus}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") onOpenFocus();
-            }}
-          >
-            <TimerHud data={current} />
-            <button
-              className="sound-toggle"
-              title={soundOn ? "Desativar som do alarme" : "Ativar som do alarme"}
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleSound();
-              }}
-            >
-              <Icon name={soundOn ? "notifications_active" : "notifications_off"} />
-            </button>
-          </div>
-        </div>
-      </header>
+      <AgendaHeader
+        current={current}
+        soundOn={soundOn}
+        debtMs={debtMs}
+        onNewTemplate={() => setTplForm({ open: true })}
+        onOpenList={() => setListOpen(true)}
+        onOpenRecover={onOpenRecover}
+        onClearCancelled={() => setConfirmClear(true)}
+        onToggleSound={onToggleSound}
+        onOpenFocus={onOpenFocus}
+      />
 
       <main>
         <div className="agenda-alerts">
