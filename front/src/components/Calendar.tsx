@@ -1,27 +1,9 @@
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import { blockColors, cancelledColors } from "../lib/colors";
 import { isoDate } from "../lib/time";
 import type { Block, BlockKind } from "../models";
-
-const COLORS: Record<BlockKind, string> = {
-  work: "#175676", // primary
-  short_break: "#4BA3C3", // secondary
-  long_break: "#8CC5DC", // long break
-};
-
-const TEXT: Record<BlockKind, string> = {
-  work: "#ffffff",
-  short_break: "#ffffff",
-  long_break: "#0f3345", // light background -> dark text
-};
-
-// darker border on light backgrounds (so it doesn't vanish in the "today" column)
-const BORDERS: Partial<Record<BlockKind, string>> = {
-  long_break: "#5fa8c9",
-};
-
-const CANCELLED = "#CE2D4F"; // cancelled event (schedule stopped occurring)
 
 const LABELS: Record<BlockKind, string> = {
   work: "Foco",
@@ -76,17 +58,16 @@ export function Calendar({
       }
       events={blocks.map((b) => {
         const cancelled = b.status === "skipped";
+        const style = cancelled ? cancelledColors : blockColors[b.kind];
         return {
           id: String(b.id),
           title:
             (cancelled ? "(cancelado) " : "") + (b.label ?? LABELS[b.kind]),
           start: b.start_ts,
           end: b.end_ts,
-          backgroundColor: cancelled ? CANCELLED : COLORS[b.kind],
-          borderColor: cancelled
-            ? CANCELLED
-            : BORDERS[b.kind] ?? COLORS[b.kind],
-          textColor: cancelled ? "#ffffff" : TEXT[b.kind],
+          backgroundColor: style.bg,
+          borderColor: style.border,
+          textColor: style.text,
           classNames: cancelled
             ? ["blk-cancelled"]
             : b.status === "done"
