@@ -52,7 +52,7 @@ const api = {
   importData: (json: string): Promise<void> =>
     ipcRenderer.invoke(CH.dataImport, json),
 
-  /** assina o evento de borda de bloco; retorna a funcao pra desinscrever */
+  /** subscribes to the block-boundary event; returns an unsubscribe function */
   onBlockBoundary: (cb: (p: { boundary: "work_end" | "work_start" }) => void) => {
     const handler = (_e: unknown, payload: { boundary: "work_end" | "work_start" }) =>
       cb(payload);

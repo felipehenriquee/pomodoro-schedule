@@ -37,7 +37,7 @@ export interface PomodoroApi {
   onBlockBoundary(cb: (p: { boundary: Boundary }) => void): Unsub;
 }
 
-// Electron expoe `window.api` via preload; Tauri usa invoke/listen.
+// Electron exposes `window.api` via preload; Tauri uses invoke/listen.
 const electronApi = (window as unknown as { api?: PomodoroApi }).api;
 const tauriEnv =
   typeof window !== "undefined" &&

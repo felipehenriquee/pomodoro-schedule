@@ -5,11 +5,11 @@ import { fmtDuration, isoDate } from "../lib/time";
 type Props = {
   open: boolean;
   debtMs: number;
-  onClose: () => void; // "agora não"
-  onClear: () => void; // zerar saldo
-  onDoNow: () => void; // criar bloco começando agora
-  onEndOfDay: () => void; // criar bloco no fim do dia de hoje
-  onPickDateTime: (date: string, time: string) => void; // data + horário escolhidos
+  onClose: () => void; // "agora não" (dismiss)
+  onClear: () => void; // clear the balance
+  onDoNow: () => void; // create a block starting now
+  onEndOfDay: () => void; // create a block at the end of today
+  onPickDateTime: (date: string, time: string) => void; // chosen date + time
 };
 
 function tomorrow(): string {

@@ -25,7 +25,7 @@ export interface TemplateRepo {
       Pick<Template, "name" | "work_min" | "short_break_min">
     >
   ): void;
-  /** edita uma pausa longa especifica (por id da linha long_break) */
+  /** edits a specific long break (by long_break row id) */
   setLongBreak(
     id: number,
     startTime: string,
@@ -36,14 +36,14 @@ export interface TemplateRepo {
 }
 
 export interface DayAgendaRepo {
-  /** cria (se preciso) e devolve id + locked do dia daquele template */
+  /** creates (if needed) and returns the day's id + locked for that template */
   ensure(date: string, templateId: number): { id: number; locked: number };
   firstForDate(date: string): number | undefined;
   createForDate(date: string, templateId: number, locked: boolean): number;
   lock(id: number): void;
-  /** apaga blocos de dias >= fromDate ainda nao travados (regeram no proximo materialize) */
+  /** deletes blocks of not-yet-locked days >= fromDate (regenerated on the next materialize) */
   clearFutureUnlockedBlocks(templateId: number, fromDate: string): void;
-  /** dias (id + date + locked) de um template a partir de fromDate, ASC */
+  /** a template's days (id + date + locked) from fromDate on, ASC */
   listForTemplateFrom(
     templateId: number,
     fromDate: string
@@ -55,11 +55,11 @@ export interface BlockRepo {
   get(id: number): Block | undefined;
   current(nowIso: string): Block | undefined;
   next(nowIso: string): Block | undefined;
-  /** proximo bloco de um kind especifico que comeca depois de nowIso (qualquer dia) */
+  /** next block of a specific kind starting after nowIso (any day) */
   nextOfKind(nowIso: string, kind: string): Block | undefined;
   nextEndingAfter(nowIso: string): { end_ts: string; kind: string } | undefined;
 
-  /** INSERT OR IGNORE (por dia+start_ts). retorna nº de linhas inseridas (0 ou 1) */
+  /** INSERT OR IGNORE (by day+start_ts). returns rows inserted (0 or 1) */
   insertIgnore(
     dayAgendaId: number,
     kind: string,
@@ -69,7 +69,7 @@ export interface BlockRepo {
     label: string | null
   ): number;
 
-  /** renomeia o slot (template_id, kind, seq) nos dias >= fromDate */
+  /** renames the slot (template_id, kind, seq) on days >= fromDate */
   setLabelForSlot(
     templateId: number,
     kind: string,
@@ -78,7 +78,7 @@ export interface BlockRepo {
     fromDate: string
   ): void;
 
-  /** insere evento avulso (manual=1). retorna id novo */
+  /** inserts an ad-hoc event (manual=1). returns the new id */
   insertManual(
     dayAgendaId: number,
     kind: string,
@@ -91,17 +91,17 @@ export interface BlockRepo {
   shift(id: number, startTs: string, endTs: string): void;
   setStatus(id: number, status: string): void;
   markDoneBefore(nowIso: string): void;
-  /** apaga todos os blocos de um dia */
+  /** deletes every block of a day */
   deleteForDayAgenda(dayAgendaId: number): void;
-  /** marca como 'skipped' os blocos do dia que comecam depois de afterIso */
+  /** marks the day's blocks starting after afterIso as 'skipped' */
   markSkippedForDayAgendaAfter(dayAgendaId: number, afterIso: string): void;
   remove(id: number): void;
-  /** apaga de vez todos os blocos cancelados; retorna quantos */
+  /** permanently deletes every cancelled block; returns how many */
   deleteAllSkipped(): number;
 
-  /** blocos do dia com start_ts >= ts (ASC), excluindo excludeId */
+  /** the day's blocks with start_ts >= ts (ASC), excluding excludeId */
   after(dayAgendaId: number, excludeId: number, tsIso: string): RowRef[];
-  /** blocos do dia que nao terminam antes de ts: end_ts > ts (ASC), excluindo excludeId */
+  /** the day's blocks that don't end before ts: end_ts > ts (ASC), excluding excludeId */
   notBefore(dayAgendaId: number, excludeId: number, tsIso: string): RowRef[];
 }
 
@@ -118,7 +118,7 @@ export interface BlockSlotRepo {
 }
 
 export interface TaskRepo {
-  /** tarefas de um evento de foco (dia + posicao seq) */
+  /** tasks of a focus event (day + seq position) */
   list(dayAgendaId: number, seq: number): Task[];
   add(dayAgendaId: number, seq: number, text: string): number;
   update(id: number, text: string): void;

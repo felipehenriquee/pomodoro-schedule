@@ -10,7 +10,7 @@ export interface AgendaContext {
 
 let ctx: AgendaContext | undefined;
 
-/** Troque `createSqliteRepositories` por outra implementacao pra usar outro banco. */
+/** Swap `createSqliteRepositories` for another implementation to use a different database. */
 export function getContext(): AgendaContext {
   if (!ctx) {
     const db = getDb();

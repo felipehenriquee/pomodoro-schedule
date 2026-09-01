@@ -1,4 +1,4 @@
-/** Esquema completo (SQLite). Aplicado quando user_version = 0. */
+/** Full schema (SQLite). Applied when user_version = 0. */
 export const SCHEMA_SQL = `
 CREATE TABLE schedule_template (
   id              INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -12,8 +12,8 @@ CREATE TABLE schedule_template (
   freq            TEXT    NOT NULL DEFAULT 'weekly', -- once|daily|weekly|interval
   anchor_date     TEXT,                             -- YYYY-MM-DD (once / interval)
   interval_days   INTEGER,
-  valid_from      TEXT,                             -- YYYY-MM-DD: so gera eventos a partir dessa data
-  valid_until     TEXT,                             -- YYYY-MM-DD: so gera eventos ate essa data
+  valid_from      TEXT,                             -- YYYY-MM-DD: only generate events from this date on
+  valid_until     TEXT,                             -- YYYY-MM-DD: only generate events up to this date
   created_at      TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -31,7 +31,7 @@ CREATE TABLE day_agenda (
   date         TEXT    NOT NULL,                  -- "YYYY-MM-DD"
   template_id  INTEGER NOT NULL REFERENCES schedule_template(id) ON DELETE CASCADE,
   generated_at TEXT    NOT NULL DEFAULT (datetime('now')),
-  locked       INTEGER NOT NULL DEFAULT 0,        -- 1 = editado a mao, materialize nao regenera
+  locked       INTEGER NOT NULL DEFAULT 0,        -- 1 = hand-edited, materialize won't regenerate
   UNIQUE(date, template_id)
 );
 
@@ -39,20 +39,20 @@ CREATE TABLE block (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
   day_agenda_id INTEGER NOT NULL REFERENCES day_agenda(id) ON DELETE CASCADE,
   kind          TEXT    NOT NULL,                 -- work | short_break | long_break
-  seq           INTEGER NOT NULL DEFAULT 0,       -- posicao 1-based dentro do MESMO kind no dia (foco1, foco2, pausa1...)
-  start_ts      TEXT    NOT NULL,                 -- RFC3339 com offset local
+  seq           INTEGER NOT NULL DEFAULT 0,       -- 1-based position among the SAME kind that day (foco1, foco2, pausa1...)
+  start_ts      TEXT    NOT NULL,                 -- RFC3339 with local offset
   end_ts        TEXT    NOT NULL,
   label         TEXT,
   status        TEXT    NOT NULL DEFAULT 'pending', -- pending | done | skipped
-  manual        INTEGER NOT NULL DEFAULT 0,       -- 1 = evento avulso (clique na agenda)
+  manual        INTEGER NOT NULL DEFAULT 0,       -- 1 = ad-hoc event (calendar click)
   UNIQUE(day_agenda_id, start_ts)
 );
 CREATE INDEX idx_block_start ON block(start_ts);
 CREATE INDEX idx_block_end   ON block(end_ts);
 CREATE INDEX idx_block_slot  ON block(day_agenda_id, kind, seq);
 
--- Override por "slot" da agenda: ex. "o 1o foco chama Estudar e dura 45min".
--- Aplicado a todos os dias da agenda quando o usuario edita um evento com escopo "all".
+-- Per-"slot" override for the schedule: e.g. "the 1st focus is named Study and lasts 45min".
+-- Applied to every day of the schedule when the user edits an event with scope "all".
 CREATE TABLE block_slot (
   id           INTEGER PRIMARY KEY AUTOINCREMENT,
   template_id  INTEGER NOT NULL REFERENCES schedule_template(id) ON DELETE CASCADE,
@@ -60,7 +60,7 @@ CREATE TABLE block_slot (
   seq          INTEGER NOT NULL,
   label        TEXT,
   duration_min INTEGER,
-  offset_min   INTEGER,  -- minutos de atraso a aplicar antes desse slot (mudanca de horario "todos")
+  offset_min   INTEGER,  -- delay in minutes to apply before this slot (time change with scope "all")
   UNIQUE(template_id, kind, seq)
 );
 
@@ -72,7 +72,7 @@ CREATE TABLE session_log (
   completed  INTEGER NOT NULL DEFAULT 0
 );
 
--- Tarefas de um evento de foco especifico (dia + posicao). Cada foco tem as suas.
+-- Tasks for a specific focus event (day + position). Each focus has its own.
 CREATE TABLE task (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
   day_agenda_id INTEGER REFERENCES day_agenda(id) ON DELETE CASCADE,

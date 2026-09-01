@@ -1,9 +1,9 @@
 /**
- * Motor de blocos: dado um dia e a config (foco/pausa/pausas longas),
- * gera a lista de mini-eventos do pomodoro.
+ * Block engine: given a day and the config (focus/break/long breaks), it
+ * produces the day's list of pomodoro mini-events.
  *
- * Porta fiel de back/src/domain/blocks.rs + `seq` (posicao no kind) e
- * `slots` (override por posicao: nome/duracao vindos de block_slot).
+ * Faithful port of back/src/domain/blocks.rs + `seq` (position within the kind)
+ * and `slots` (per-position override: name/duration from block_slot).
  */
 
 export type BlockKind = "work" | "short_break" | "long_break";
@@ -14,13 +14,13 @@ export interface LongBreak {
   label: string;
 }
 
-/** Override de um "slot" (ex.: o 1o foco chama X, dura Y min, comeca Z min depois). */
+/** Per-"slot" override (e.g. the 1st focus is named X, lasts Y min, starts Z min later). */
 export interface SlotOverride {
   kind: BlockKind;
   seq: number;
   label: string | null;
   durationMin: number | null;
-  offsetMin: number | null; // atraso (min) aplicado antes desse slot
+  offsetMin: number | null; // delay (min) applied before this slot
 }
 
 export interface DayConfig {
@@ -98,7 +98,7 @@ export function generate(dateStr: string, cfg: DayConfig): GeneratedBlock[] {
       continue;
     }
 
-    // ---- foco ----
+    // ---- focus ----
     const workSeq = seqOf.work + 1;
     const workOv = slotFor("work", workSeq);
     if (workOv?.offsetMin) cursor = addMinutes(cursor, workOv.offsetMin);
@@ -125,7 +125,7 @@ export function generate(dateStr: string, cfg: DayConfig): GeneratedBlock[] {
     cursor = workEnd;
     if (cursor.getTime() >= dayEnd.getTime()) break;
 
-    // ---- pausa curta ----
+    // ---- short break ----
     if (!longBreakAt(cursor)) {
       const sbSeq = seqOf.short_break + 1;
       const sbOv = slotFor("short_break", sbSeq);

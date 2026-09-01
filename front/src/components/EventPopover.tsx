@@ -42,7 +42,7 @@ export function EventPopover({
   const canPause =
     !cancelled &&
     new Date(block.start_ts).getTime() <= now &&
-    now < new Date(block.end_ts).getTime(); // evento acontecendo agora (qualquer tipo)
+    now < new Date(block.end_ts).getTime(); // event happening right now (any kind)
 
   return (
     <>

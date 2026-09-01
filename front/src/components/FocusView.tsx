@@ -11,7 +11,7 @@ const KIND_LABEL: Record<BlockKind, string> = {
   long_break: "Descanso longo",
 };
 
-// usado em "2o foco do dia", "3o descanso curto do dia"
+// used in "2o foco do dia", "3o descanso curto do dia"
 const NTH_LABEL: Record<BlockKind, string> = {
   work: "foco",
   short_break: "descanso curto",
@@ -49,13 +49,13 @@ export function FocusView({
   const cur = current?.current ?? null;
   const remaining = cur ? new Date(cur.end_ts).getTime() - now : 0;
 
-  // Cor do fundo: o botao escolhido manda; senao segue o evento atual
+  // Background color: the picked button wins; otherwise follows the current event
   const bgKind: BlockKind | "idle" = picked ?? cur?.kind ?? "idle";
 
-  // "trocou a guia e a guia atual (aquele tipo) nao esta rodando agora"
+  // "switched tabs and the picked tab (that kind) is not running right now"
   const showUpcoming = picked !== null && cur?.kind !== picked;
 
-  // Proximo evento do tipo escolhido (qualquer dia) -- via API
+  // Next event of the picked kind (any day) -- via API
   useEffect(() => {
     if (!showUpcoming || !isDesktop || picked === null) {
       setUpcoming(null);
@@ -71,7 +71,7 @@ export function FocusView({
     };
   }, [showUpcoming, picked, current?.current?.id]);
 
-  // Rotulo "Nº <tipo> do dia" do evento atual (ou do proximo se nao houver)
+  // "Nº <kind> do dia" label for the current event (or the next one if none)
   const metaRef = cur ?? current?.next ?? null;
   const metaText = metaRef
     ? `${metaRef.seq ?? 1}º ${NTH_LABEL[metaRef.kind]} do dia${

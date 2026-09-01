@@ -4,9 +4,9 @@ export function isoDate(d: Date): string {
   ).padStart(2, "0")}`;
 }
 
-/** Segunda a domingo da semana de `base`. */
+/** Monday to Sunday of `base`'s week. */
 export function weekRange(base = new Date()): { from: string; to: string } {
-  const offset = (base.getDay() + 6) % 7; // 0 = segunda
+  const offset = (base.getDay() + 6) % 7; // 0 = Monday
   const monday = new Date(base);
   monday.setDate(base.getDate() - offset);
   const sunday = new Date(monday);
@@ -22,7 +22,7 @@ export function fmtDuration(ms: number): string {
   return `${mm}:${ss}`;
 }
 
-/** Date -> RFC3339 com offset local (ex: 2026-08-31T09:00:00-03:00) */
+/** Date -> RFC3339 with local offset (e.g. 2026-08-31T09:00:00-03:00) */
 export function localRfc3339(d: Date): string {
   const p = (n: number) => String(n).padStart(2, "0");
   const off = -d.getTimezoneOffset();
@@ -35,7 +35,7 @@ export function localRfc3339(d: Date): string {
   );
 }
 
-/** RFC3339 -> "HH:MM" (hora local) */
+/** RFC3339 -> "HH:MM" (local time) */
 export function fmtHM(iso: string): string {
   const d = new Date(iso);
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(
@@ -44,7 +44,7 @@ export function fmtHM(iso: string): string {
   )}`;
 }
 
-/** RFC3339 -> "hoje 14:00" ou "ter 02/09 09:00" */
+/** RFC3339 -> "hoje 14:00" or "ter 02/09 09:00" */
 export function fmtWhen(iso: string): string {
   const d = new Date(iso);
   const time = fmtHM(iso);
@@ -55,7 +55,7 @@ export function fmtWhen(iso: string): string {
   return `${day} ${time}`;
 }
 
-/** RFC3339 -> "segunda-feira, 31 de agosto de 2026" */
+/** RFC3339 -> "segunda-feira, 31 de agosto de 2026" (pt-BR long date) */
 export function fmtFullDate(iso: string): string {
   return new Date(iso).toLocaleDateString("pt-BR", {
     weekday: "long",

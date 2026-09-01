@@ -1,10 +1,10 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// Porta fixa: o app desktop (Electron: back-node/src/main/index.ts DEV_URL,
-// ou Tauri: back/tauri.conf.json devUrl) aponta pra 1420.
+// Fixed port: the desktop app (Electron: back-node/src/main/index.ts DEV_URL,
+// or Tauri: back/tauri.conf.json devUrl) points to 1420.
 export default defineConfig({
-  base: "./", // caminhos relativos: funciona ao ser carregado via file:// no Electron empacotado
+  base: "./", // relative paths: works when loaded via file:// in the packaged Electron app
   plugins: [react()],
   clearScreen: false,
   server: {

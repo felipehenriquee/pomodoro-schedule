@@ -1,5 +1,5 @@
-// Gera dois alarmes .wav em front/public/.
-// Troque livremente por arquivos seus (mantendo os nomes).
+// Generates two .wav alarms in front/public/.
+// Swap them freely for your own files (keeping the names).
 import { writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -11,7 +11,7 @@ const RATE = 44100;
 
 /** @param {Array<{freqs:number[], dur:number, gap:number}>} beeps */
 function renderWav(beeps, name) {
-  // conta de amostras por segmento (inteiros) e total exato
+  // sample count per segment (integers) and exact total
   const segs = beeps.map((b) => ({
     ...b,
     tone: Math.floor(RATE * b.dur),
@@ -45,14 +45,14 @@ function renderWav(beeps, name) {
       const v = Math.max(-1, Math.min(1, s));
       buf.writeInt16LE((v * 32767) | 0, 44 + pos * 2);
     }
-    pos += g.silence; // silencio ja esta zerado pelo Buffer.alloc
+    pos += g.silence; // silence is already zeroed by Buffer.alloc
   }
 
   writeFileSync(join(outDir, name), buf);
   console.log("wrote public/" + name);
 }
 
-// :50 -> fim do foco (bips descendentes, "pode parar")
+// :50 -> end of focus (descending beeps, "you can stop")
 renderWav(
   [
     { freqs: [880, 660], dur: 0.18, gap: 0.09 },
@@ -62,7 +62,7 @@ renderWav(
   "alarm-end.wav"
 );
 
-// :00 -> volta ao foco (acorde ascendente, "bora")
+// :00 -> back to focus (ascending chord, "let's go")
 renderWav(
   [
     { freqs: [523], dur: 0.15, gap: 0.06 },

@@ -19,7 +19,7 @@ let quitting = false;
 
 app.setAppUserModelId("com.felipe.pomodoro");
 
-// instancia unica
+// single instance
 if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
@@ -33,7 +33,7 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 function iconPath(): string {
-  // dev: resources/ na raiz do projeto; prod: empacotado em resources/
+  // dev: resources/ at the project root; prod: bundled under resources/
   return isDev
     ? join(app.getAppPath(), "resources", "icon.png")
     : join(process.resourcesPath, "icon.png");
@@ -53,7 +53,7 @@ function createWindow(): void {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
-      // libera o Web Audio sem gesto do usuario -> som "lembrado" toca ao abrir
+      // unlocks Web Audio without a user gesture -> the "remembered" sound plays on open
       autoplayPolicy: "no-user-gesture-required",
     },
   });
@@ -135,8 +135,8 @@ app.on("will-quit", () => {
   closeDb();
 });
 
-// nao encerra ao fechar todas as janelas (fica na bandeja)
+// don't quit when all windows are closed (stays in the tray)
 app.on("window-all-closed", () => {
   if (process.platform === "darwin") return;
-  // no-op: mantido vivo pela bandeja
+  // no-op: kept alive by the tray
 });

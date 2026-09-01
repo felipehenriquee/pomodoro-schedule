@@ -1,4 +1,4 @@
-// Icones do Material Symbols (Google), embutidos como SVG pra funcionar offline.
+// Material Symbols icons (Google), inlined as SVG so they work offline.
 type IconName =
   | "notifications_active"
   | "notifications_off"

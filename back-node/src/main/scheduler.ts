@@ -7,7 +7,7 @@ import { dateStr, localRfc3339 } from "./util/time";
 let timer: NodeJS.Timeout | undefined;
 let lastAheadDay = "";
 
-/** Roda `materializeAhead` no maximo 1x por dia (barato mas nao a cada tick). */
+/** Runs `materializeAhead` at most once a day (cheap, but not every tick). */
 function keepAhead(): void {
   const today = dateStr();
   if (lastAheadDay === today) return;
@@ -20,11 +20,11 @@ function keepAhead(): void {
 }
 
 /**
- * Dorme ate a proxima borda de bloco; ao chegar la emite `block-boundary`
- * (o renderer toca o som) e dispara a notificacao nativa. setTimeout no
- * processo main do Electron nao sofre throttling, entao roda com a janela
- * minimizada na bandeja. Tambem mantem ~120 dias sempre materializados,
- * pra agenda nunca "acabar".
+ * Sleeps until the next block boundary; on arrival it emits `block-boundary`
+ * (the renderer plays the sound) and fires the native notification. setTimeout
+ * in the Electron main process is not throttled, so it keeps running while the
+ * window is minimized to the tray. It also keeps ~120 days always materialized
+ * so the schedule never "runs out".
  */
 export function startScheduler(getWin: () => BrowserWindow | null): void {
   const schedule = (ms: number) => {

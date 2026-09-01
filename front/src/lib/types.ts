@@ -21,8 +21,8 @@ export interface TemplateInput {
   freq: Freq;
   anchor_date: string | null; // "YYYY-MM-DD"
   interval_days: number | null;
-  valid_from: string | null; // "YYYY-MM-DD" - so gera a partir dessa data
-  valid_until: string | null; // "YYYY-MM-DD" - so gera ate essa data
+  valid_from: string | null; // "YYYY-MM-DD" - only generates from this date on
+  valid_until: string | null; // "YYYY-MM-DD" - only generates up to this date
   long_breaks: LongBreakInput[];
 }
 
@@ -53,7 +53,7 @@ export interface Block {
   id: number;
   day_agenda_id: number;
   kind: BlockKind;
-  seq?: number; // posicao no mesmo kind do dia (foco1, foco2...) - so no back Electron
+  seq?: number; // position among same-kind blocks that day (foco1, foco2...) - Electron back only
   start_ts: string; // RFC3339
   end_ts: string;
   label: string | null;

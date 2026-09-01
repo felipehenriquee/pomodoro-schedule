@@ -1,4 +1,4 @@
-/** Date -> RFC3339 com offset local (ex: 2026-08-31T09:00:00-03:00) */
+/** Date -> RFC3339 with local offset (e.g. 2026-08-31T09:00:00-03:00) */
 export function localRfc3339(d: Date): string {
   const p = (n: number) => String(n).padStart(2, "0");
   const off = -d.getTimezoneOffset();
@@ -11,19 +11,19 @@ export function localRfc3339(d: Date): string {
   );
 }
 
-/** "YYYY-MM-DD" local de uma Date (default: agora) */
+/** local "YYYY-MM-DD" of a Date (default: now) */
 export function dateStr(d = new Date()): string {
   const p = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
-/** "HH:MM" local de uma Date */
+/** local "HH:MM" of a Date */
 export function hhmm(d: Date): string {
   const p = (n: number) => String(n).padStart(2, "0");
   return `${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
-/** soma dias a uma data "YYYY-MM-DD" */
+/** adds days to a "YYYY-MM-DD" date */
 export function addDays(ds: string, n: number): string {
   const d = new Date(ds + "T00:00:00");
   d.setDate(d.getDate() + n);

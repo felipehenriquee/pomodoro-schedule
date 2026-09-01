@@ -13,7 +13,7 @@ import type { AgendaContext } from "./context";
 
 const KINDS = new Set(["work", "short_break", "long_break"]);
 
-/** Quantos dias adiante manter sempre materializados. */
+/** How many days ahead to always keep materialized. */
 export const MATERIALIZE_AHEAD_DAYS = 120;
 
 export function listTemplates(ctx: AgendaContext): Template[] {
@@ -28,13 +28,13 @@ export function saveTemplate(ctx: AgendaContext, input: TemplateInput): number {
     if (input.id == null) return ctx.repos.templates.create(input);
 
     ctx.repos.templates.update(input.id, input);
-    const tpl = ctx.repos.templates.get(input.id)!; // ja com a config nova
+    const tpl = ctx.repos.templates.get(input.id)!; // already with the new config
 
-    // Cada dia da agenda de HOJE em diante (ignora dias hand-edited):
-    //  - ainda ocorre e e um dia FUTURO -> apaga os blocos (regeneram)
-    //  - ainda ocorre e e HOJE -> deixa como esta (historico parcial do dia)
-    //  - deixou de ocorrer -> cancela os blocos que ainda nao comecaram
-    //    (start_ts > agora) e trava o dia; o que ja passou fica intacto
+    // Every day of the schedule from TODAY on (skips hand-edited days):
+    //  - still occurs and is a FUTURE day -> delete the blocks (regenerated)
+    //  - still occurs and is TODAY -> leave it (partial history of the day)
+    //  - stopped occurring -> cancel the blocks that haven't started yet
+    //    (start_ts > now) and lock the day; what already passed stays intact
     for (const day of ctx.repos.dayAgendas.listForTemplateFrom(input.id, today)) {
       if (day.locked) continue;
       const inWindow =
@@ -64,7 +64,7 @@ export function saveTemplate(ctx: AgendaContext, input: TemplateInput): number {
   return id;
 }
 
-/** Garante que os proximos N dias estejam materializados (idempotente). */
+/** Ensures the next N days are materialized (idempotent). */
 export function materializeAhead(ctx: AgendaContext): number {
   const today = dateStr();
   return materialize(ctx, today, addDays(today, MATERIALIZE_AHEAD_DAYS));
@@ -77,18 +77,18 @@ export function deleteTemplate(ctx: AgendaContext, id: number): void {
   })();
 }
 
-/** Gera (idempotente) os blocos dos templates ativos no intervalo [from, to]. */
+/** Generates (idempotent) the blocks of active templates in the range [from, to]. */
 export function materialize(ctx: AgendaContext, from: string, to: string): number {
   const templates = ctx.repos.templates.list().filter((t) => t.active);
   const today = dateStr();
   let created = 0;
 
   for (let d = from; d <= to; d = addDays(d, 1)) {
-    // overrides de slot (nome/duracao/atraso) so valem de hoje em diante;
-    // dias passados sempre saem no formato "puro" do template
+    // slot overrides (name/duration/offset) only apply from today on;
+    // past days always come out in the template's "plain" form
     const useSlots = d >= today;
     for (const tpl of templates) {
-      // janela de validade da agenda
+      // schedule validity window
       if (tpl.valid_from && d < tpl.valid_from) continue;
       if (tpl.valid_until && d > tpl.valid_until) continue;
 
@@ -157,7 +157,7 @@ export function getCurrentBlock(ctx: AgendaContext): CurrentBlock {
   };
 }
 
-/** Proximo evento de um tipo especifico (foco / pausa curta / pausa longa). */
+/** Next event of a specific kind (focus / short break / long break). */
 export function getNextOfKind(ctx: AgendaContext, kind: string): Block | null {
   return ctx.repos.blocks.nextOfKind(localRfc3339(new Date()), kind) ?? null;
 }
@@ -171,13 +171,14 @@ export function setBlockStatus(
 }
 
 /**
- * Edita um evento.
- * - scope "one": muda so aquele bloco (nome/horario) + empurra os seguintes do
- *   dia + trava o dia. Nao mexe na agenda nem nos outros dias.
- * - scope "all": alem do acima, grava um override no "slot" (template_id, kind,
- *   seq) e aplica em TODOS os dias da agenda — renomeia todos os "focoN"; se a
- *   duracao mudou, regenera os dias nao travados com a nova duracao.
- * Nunca altera o nome da agenda (template.name).
+ * Edits an event.
+ * - scope "one": changes just that block (name/time) + pushes the day's
+ *   following blocks + locks the day. Doesn't touch the schedule or other days.
+ * - scope "all": on top of the above, writes an override on the "slot"
+ *   (template_id, kind, seq) and applies it to EVERY day of the schedule —
+ *   renames every "focoN"; if the duration changed, regenerates the unlocked
+ *   days with the new duration.
+ * Never changes the schedule name (template.name).
  */
 export function updateBlock(ctx: AgendaContext, edit: BlockEdit): void {
   const { repos } = ctx;
@@ -195,8 +196,8 @@ export function updateBlock(ctx: AgendaContext, edit: BlockEdit): void {
   const startShiftMin = Math.round((newStart - oldStart) / 60_000);
   const seq = cur.seq || 1;
 
-  // Aplica um lote de reposicionamentos sem violar UNIQUE(day_agenda_id,start_ts):
-  // 1a passada estaciona todos ~1000 dias no futuro; 2a passada poe no lugar final.
+  // Applies a batch of repositions without violating UNIQUE(day_agenda_id,start_ts):
+  // pass 1 parks everyone ~1000 days in the future; pass 2 puts them in their final spot.
   const PARK_MS = 1000 * 86_400_000;
   const bump = (iso: string) =>
     localRfc3339(new Date(new Date(iso).getTime() + PARK_MS));
@@ -241,12 +242,12 @@ export function updateBlock(ctx: AgendaContext, edit: BlockEdit): void {
 
     repos.dayAgendas.lock(cur.day_agenda_id);
 
-    // 3. "todos os dias" da agenda -- so de AMANHA em diante; hoje e o passado
-    //    ficam como estao (evento de hoje ja pode ter acontecido).
+    // 3. "every day" of the schedule -- only from TOMORROW on; today and the
+    //    past stay as they are (today's event may already have happened).
     if (edit.scope === "all") {
       const from = addDays(dateStr(), 1);
       if (cur.kind === "long_break") {
-        // pausa longa e definida por horario na agenda -> edita a linha long_break
+        // a long break is defined by time on the schedule -> edit the long_break row
         const tpl = repos.templates.get(cur.template_id);
         const lb = tpl?.long_breaks[seq - 1];
         if (lb) {
@@ -260,7 +261,7 @@ export function updateBlock(ctx: AgendaContext, edit: BlockEdit): void {
         repos.blocks.setLabelForSlot(cur.template_id, cur.kind, seq, edit.label, from);
         repos.dayAgendas.clearFutureUnlockedBlocks(cur.template_id, from);
       } else {
-        // foco / pausa curta -> override no block_slot (duracao + atraso)
+        // focus / short break -> override in block_slot (duration + offset)
         const prev = repos.blockSlots
           .forTemplate(cur.template_id)
           .find((s) => s.kind === cur.kind && s.seq === seq);
@@ -282,7 +283,7 @@ export function updateBlock(ctx: AgendaContext, edit: BlockEdit): void {
     }
   })();
 
-  // regenera ja os proximos ~90 dias (o front so pede a semana visivel)
+  // regenerate the next ~90 days now (the front only asks for the visible week)
   if (edit.scope === "all") {
     const from = addDays(dateStr(), 1);
     materialize(ctx, from, addDays(from, 90));
@@ -290,9 +291,9 @@ export function updateBlock(ctx: AgendaContext, edit: BlockEdit): void {
 }
 
 /**
- * Cria um evento avulso (clique no calendario). Empurra em cadeia os blocos que
- * colidem pra depois do novo terminar (2 passadas pra nao bater no UNIQUE) e
- * retorna `true` se houve empurrao.
+ * Creates an ad-hoc event (calendar click). Chain-pushes the colliding blocks
+ * to after the new one ends (2 passes so the UNIQUE isn't hit) and returns
+ * `true` if anything was pushed.
  */
 export function createBlock(ctx: AgendaContext, input: BlockCreate): boolean {
   const { repos } = ctx;
@@ -302,7 +303,7 @@ export function createBlock(ctx: AgendaContext, input: BlockCreate): boolean {
   const ne = new Date(input.end_ts).getTime();
   if (ne <= ns) throw new Error("o fim precisa ser depois do inicio");
 
-  // garante que os blocos automaticos do dia existam antes de travar
+  // make sure the day's automatic blocks exist before locking it
   materialize(ctx, input.date, input.date);
 
   return ctx.db.transaction(() => {
@@ -321,7 +322,7 @@ export function createBlock(ctx: AgendaContext, input: BlockCreate): boolean {
       input.label
     );
 
-    // 1a passada: calcula novas posicoes (cursor caminha pra frente)
+    // pass 1: compute new positions (cursor walks forward)
     const others = repos.blocks.notBefore(agendaId, newId, input.start_ts);
     const planned: { id: number; start: string; end: string }[] = [];
     let cursor = ne;
@@ -341,7 +342,7 @@ export function createBlock(ctx: AgendaContext, input: BlockCreate): boolean {
         cursor = oe;
       }
     }
-    // grava do fim pro comeco: o slot de destino ja esta livre
+    // write from last to first: the target slot is already free
     for (const p of [...planned].reverse()) repos.blocks.shift(p.id, p.start, p.end);
 
     repos.dayAgendas.lock(agendaId);
@@ -350,12 +351,12 @@ export function createBlock(ctx: AgendaContext, input: BlockCreate): boolean {
 }
 
 /**
- * Botao "excluir" do evento:
- *  - evento avulso (manual) -> apaga de vez;
- *  - evento de agenda -> cancela (status 'skipped'), pra poder "retomar" depois.
- * Em ambos trava o dia pra o materialize nao regenerar.
+ * The event's "delete" button:
+ *  - ad-hoc event (manual) -> deleted for good;
+ *  - schedule event -> cancelled (status 'skipped'), so it can be "restored".
+ * Either way it locks the day so materialize won't regenerate it.
  */
-/** Apaga de vez todos os eventos cancelados. Retorna quantos foram removidos. */
+/** Permanently deletes every cancelled event. Returns how many were removed. */
 export function deleteCancelledBlocks(ctx: AgendaContext): number {
   return ctx.repos.blocks.deleteAllSkipped();
 }
@@ -363,7 +364,7 @@ export function deleteCancelledBlocks(ctx: AgendaContext): number {
 export function deleteBlock(ctx: AgendaContext, id: number): void {
   const b = ctx.repos.blocks.get(id);
   if (!b) return;
-  // avulso OU ja cancelado -> apaga de vez; senao -> cancela (pra poder retomar)
+  // ad-hoc OR already cancelled -> delete for good; otherwise -> cancel (so it can be restored)
   if (b.manual || b.status === "skipped") ctx.repos.blocks.remove(id);
   else ctx.repos.blocks.setStatus(id, "skipped");
   ctx.repos.dayAgendas.lock(b.day_agenda_id);

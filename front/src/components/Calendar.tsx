@@ -5,23 +5,23 @@ import { isoDate } from "../lib/time";
 import type { Block, BlockKind } from "../lib/types";
 
 const COLORS: Record<BlockKind, string> = {
-  work: "#175676", // primaria
-  short_break: "#4BA3C3", // secundaria
-  long_break: "#8CC5DC", // descanso longo
+  work: "#175676", // primary
+  short_break: "#4BA3C3", // secondary
+  long_break: "#8CC5DC", // long break
 };
 
 const TEXT: Record<BlockKind, string> = {
   work: "#ffffff",
   short_break: "#ffffff",
-  long_break: "#0f3345", // fundo claro -> texto escuro
+  long_break: "#0f3345", // light background -> dark text
 };
 
-// borda mais escura em fundos claros (pra nao sumir na coluna do dia atual)
+// darker border on light backgrounds (so it doesn't vanish in the "today" column)
 const BORDERS: Partial<Record<BlockKind, string>> = {
   long_break: "#5fa8c9",
 };
 
-const CANCELLED = "#CE2D4F"; // evento cancelado (agenda deixou de ocorrer)
+const CANCELLED = "#CE2D4F"; // cancelled event (schedule stopped occurring)
 
 const LABELS: Record<BlockKind, string> = {
   work: "Foco",

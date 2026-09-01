@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { api, isDesktop } from "../lib/ipc";
 import type { Block } from "../lib/types";
 
-/** Materializa o intervalo e devolve os blocos [from, to] (datas "YYYY-MM-DD"). */
+/** Materializes the range and returns the blocks [from, to] ("YYYY-MM-DD" dates). */
 export function useBlocks(from: string, to: string) {
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [loading, setLoading] = useState(false);

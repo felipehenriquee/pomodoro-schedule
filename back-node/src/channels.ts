@@ -1,4 +1,4 @@
-/** Nomes dos canais IPC. Usado pelo main e pelo preload. */
+/** IPC channel names. Used by main and preload. */
 export const CH = {
   templatesList: "templates:list",
   templatesSave: "templates:save",
@@ -19,6 +19,6 @@ export const CH = {
   tasksDelete: "tasks:delete",
   dataExport: "data:export",
   dataImport: "data:import",
-  // evento main -> renderer
+  // main -> renderer event
   evtBlockBoundary: "block-boundary",
 } as const;

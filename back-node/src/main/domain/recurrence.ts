@@ -1,5 +1,5 @@
 /**
- * Recorrencia de um template. Porta de back/src/domain/recurrence.rs.
+ * Recurrence of a template. Ported from back/src/domain/recurrence.rs.
  * freq: "once" | "daily" | "weekly" | "interval"
  */
 
@@ -14,7 +14,7 @@ export function parseDays(spec: string): string[] {
     .filter((s) => (DOW as readonly string[]).includes(s));
 }
 
-/** dateStr "YYYY-MM-DD", anchor idem (ou null) */
+/** dateStr "YYYY-MM-DD", anchor likewise (or null) */
 export function occursOn(
   dateStr: string,
   freq: string,

@@ -1,4 +1,4 @@
-// Tipos trocados com o renderer (mesma forma de front/src/lib/types.ts)
+// Types exchanged with the renderer (same shape as front/src/lib/types.ts)
 
 export type BlockKind = "work" | "short_break" | "long_break";
 export type BlockStatus = "pending" | "done" | "skipped";
@@ -55,7 +55,7 @@ export interface Block {
   id: number;
   day_agenda_id: number;
   kind: BlockKind;
-  seq: number; // posicao 1-based no mesmo kind do dia (foco1, foco2, pausa1...)
+  seq: number; // 1-based position among same-kind blocks that day (foco1, foco2, pausa1...)
   start_ts: string;
   end_ts: string;
   label: string | null;

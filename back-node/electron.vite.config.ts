@@ -1,8 +1,8 @@
 import { resolve } from "node:path";
 import { defineConfig, externalizeDepsPlugin } from "electron-vite";
 
-// O renderer (React) e o projeto separado em ../front, com o proprio Vite.
-// Aqui so cuidamos do processo main e do preload.
+// The renderer (React) is the separate project in ../front, with its own Vite.
+// Here we only handle the main process and the preload.
 export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin()],

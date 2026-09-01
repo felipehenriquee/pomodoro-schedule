@@ -1,11 +1,11 @@
 # Pomodoro Schedule
 
-App desktop onde você cadastra **agendas recorrentes** e recebe **alarme sonoro
-+ notificação** nas trocas de bloco do pomodoro.
+Desktop app where you register **recurring schedules** and get an **audible alarm
++ notification** on every pomodoro block transition.
 
-Exemplo de agenda: `seg-sex, 08:00-18:00, 50 min de foco, 10 min de pausa, pausa
-longa 12:00-14:00`. Como `50 + 10 = 60`, o alarme cai sempre no minuto `:50`
-(fim do foco) e no `:00` (volta ao foco).
+Example schedule: `Mon-Fri, 08:00-18:00, 50 min focus, 10 min break, long break
+12:00-14:00`. Since `50 + 10 = 60`, the alarm always lands on `:50` (end of
+focus) and `:00` (back to focus).
 
 ## Stack
 
@@ -15,118 +15,121 @@ pomodoro/
 └─ back-node/   Electron + TypeScript + better-sqlite3
 ```
 
-- `back/` guarda uma versão anterior do backend em **Rust/Tauri**, mantida só
-  como referência (fora deste repo). Veja `back/TAURI.md`.
+- `back/` holds an earlier version of the backend in **Rust/Tauri**, kept only
+  as reference (not part of this repo). See `back/TAURI.md`.
 
-## Rodar em desenvolvimento
+## Development
 
 ```bash
 cd front && npm install && npm run gen-sounds && cd ..
-cd back-node && npm install     # postinstall recompila o better-sqlite3 p/ Electron
-npm run dev                     # dentro de back-node/: sobe o Vite do front + a janela Electron
+cd back-node && npm install     # postinstall rebuilds better-sqlite3 for Electron
+npm run dev                     # inside back-node/: starts the front Vite + the Electron window
 ```
 
-Rode sempre por um terminal normal, **não pelo terminal integrado do VSCode**
-instalado via snap (ele injeta `LD_LIBRARY_PATH` do snap e quebra o Electron).
+Always run from a plain terminal, **not the VSCode integrated terminal** when
+VSCode is installed via snap (it injects the snap's `LD_LIBRARY_PATH` and breaks
+Electron).
 
-## Gerar instalador
+## Building the installer
 
 ```bash
 cd back-node
 npm run package                 # -> back-node/dist/
 ```
 
-Linux: `.AppImage` (portável) e `.deb` (`sudo apt install ./...deb`, instala em
-`/opt/Pomodoro/`). Gerar `.exe` (Windows) exige buildar num Windows/CI porque o
-`better-sqlite3` é módulo nativo.
+Linux: `.AppImage` (portable) and `.deb` (`sudo apt install ./...deb`, installs
+to `/opt/Pomodoro/`). Building a `.exe` (Windows) requires building on Windows/CI
+because `better-sqlite3` is a native module.
 
-## Arquitetura do back-node
+## back-node architecture
 
-| Peça | Onde |
+| Piece | Where |
 |---|---|
-| Domínio (motor de blocos + recorrência), **com testes** (`npm test`) | `src/main/domain/` |
-| Camada de dados desacoplada (repository pattern) | `src/main/db/repositories/` — `types.ts` (interfaces) + `sqlite/` (impl). Trocar de banco = nova pasta com a mesma interface |
-| Orquestração (materialize, updateBlock, createBlock, ...) | `src/main/services/agenda.ts` |
-| Scheduler de alarmes | `src/main/scheduler.ts` — `setTimeout` no processo main (não sofre throttling; roda minimizado na bandeja) |
+| Domain (block engine + recurrence), **with tests** (`npm test`) | `src/main/domain/` |
+| Decoupled data layer (repository pattern) | `src/main/db/repositories/` — `types.ts` (interfaces) + `sqlite/` (impl). Swapping databases = a new folder implementing the same interface |
+| Orchestration (materialize, updateBlock, createBlock, ...) | `src/main/services/agenda.ts` |
+| Alarm scheduler | `src/main/scheduler.ts` — `setTimeout` in the main process (not throttled; keeps running when minimized to the tray) |
 | IPC | `src/main/ipc.ts` (`ipcMain.handle`) + `src/preload/index.ts` (`window.api`) + `src/channels.ts` |
-| Janela, bandeja, fechar-pra-bandeja, instância única | `src/main/index.ts` |
+| Window, tray, close-to-tray, single instance | `src/main/index.ts` |
 
-Banco: `~/.config/Pomodoro/pomodoro.sqlite` (Linux) /
-`%APPDATA%\Pomodoro\pomodoro.sqlite` (Windows). Criado no primeiro uso; o
-usuário não instala banco nenhum. Esquema aplicado por `user_version`
-(`src/main/db/schema.ts` + migrations em `db/index.ts`).
+Database: `~/.config/Pomodoro/pomodoro.sqlite` (Linux) /
+`%APPDATA%\Pomodoro\pomodoro.sqlite` (Windows). Created on first run; the user
+installs no database at all. Schema applied via `user_version`
+(`src/main/db/schema.ts` + migrations in `db/index.ts`).
 
-## Como funciona o alarme
+## How the alarm works
 
-O `scheduler` (processo main) dorme até a próxima borda de bloco. Ao chegar:
+The `scheduler` (main process) sleeps until the next block boundary. When it
+arrives:
 
-1. emite `block-boundary` -> o renderer toca `alarm-end.wav` (`:50`) ou
-   `alarm-start.wav` (`:00`) via elemento `<audio>`;
-2. dispara a **notificação nativa** do SO;
-3. marca o bloco como concluído.
+1. it emits `block-boundary` -> the renderer plays `alarm-end.wav` (`:50`) or
+   `alarm-start.wav` (`:00`) through an `<audio>` element;
+2. it fires the **native OS notification**;
+3. it marks the block as done.
 
-O som é liberado sem gesto do usuário (`webPreferences.autoplayPolicy`) e a
-preferência (ligado/desligado) fica no `localStorage` (`pomodoro:soundOn`,
-default ligado) — abre já no estado que você deixou. Troque os sons colocando
-arquivos seus em `front/public/` com os mesmos nomes.
+Audio is unlocked without a user gesture (`webPreferences.autoplayPolicy`) and
+the preference (on/off) is stored in `localStorage` (`pomodoro:soundOn`, on by
+default) — the app opens in the state you left it. Swap the sounds by dropping
+your own files into `front/public/` with the same names.
 
-**Fechar a janela = minimizar pra bandeja** (o app segue vivo alarmando). Menu
-da bandeja -> "Sair" pra encerrar. No GNOME o ícone da bandeja precisa da
-extensão AppIndicator (o Ubuntu costuma já trazer).
+**Closing the window = minimize to the tray** (the app stays alive alarming).
+Tray menu -> "Sair" to actually quit. On GNOME the tray icon needs the
+AppIndicator extension (Ubuntu usually ships it).
 
-## Agendas
+## Schedules
 
-Uma agenda (template) é permanente e recorrente — você nunca recria.
+A schedule (template) is permanent and recurring — you never recreate it.
 
-- Frequência: `Não repetir` (uma data), `Todos os dias`, `Dias da semana`
-  (toggles) ou `Intervalo de dias` (a cada N dias a partir de uma data).
-- Janela de validade opcional: `válido de` / `válido até` (o "de" fica travado
-  ao editar).
-- O `materialize` mantém sempre ~120 dias à frente gerados (na criação/edição e
-  1x por dia pelo scheduler). Navegar no calendário carrega a semana visível.
-- Header da Agenda: **"+ nova agenda"**, **"ver agendas"** (lista com editar /
-  excluir), botão de **saldo**, e **⋮** -> "excluir todos os eventos cancelados".
+- Frequency: `Não repetir` (single date), `Todos os dias`, `Dias da semana`
+  (toggles) or `Intervalo de dias` (every N days from a start date).
+- Optional validity window: `válido de` / `válido até` (the "from" is locked
+  when editing).
+- `materialize` always keeps ~120 days ahead generated (on create/edit and once
+  a day by the scheduler). Navigating the calendar loads the visible week.
+- Agenda header: **"+ nova agenda"**, **"ver agendas"** (list with edit /
+  delete), a **balance** button, and **⋮** -> "delete all cancelled events".
 
-### Editar agenda
+### Editing a schedule
 
-Salva de **hoje em diante** (passado nunca muda). Para cada dia futuro não
-editado à mão: se ainda ocorre -> regenera com a config nova; se **deixou de
-ocorrer** (mudou a recorrência/validade) -> os eventos que ainda não começaram
-viram **cancelados** (não são apagados), na cor `#CE2D4F`.
+Applies from **today onward** (the past never changes). For each future day not
+hand-edited: if it still occurs -> regenerated with the new config; if it
+**stops occurring** (recurrence/validity changed) -> events that haven't started
+yet become **cancelled** (not deleted), coloured `#CE2D4F`.
 
-## Eventos
+## Events
 
-Cada bloco tem `seq` = posição 1-based dentro do mesmo tipo no dia (foco1,
-foco2, pausa1...). `block_slot(template_id, kind, seq)` guarda override de
-nome / duração / atraso por posição.
+Every block has a `seq` = 1-based position among blocks of the same kind on that
+day (foco1, foco2, pausa1...). `block_slot(template_id, kind, seq)` stores a
+per-position override for name / duration / offset.
 
-- **Criar** avulso: clique num horário do calendário. Se colidir, os eventos
-  seguintes do dia são empurrados ("estaciona e recoloca" pra não violar o
-  UNIQUE). Fica com `block.manual = 1` e trava o dia.
-- **Editar** (gaveta lateral): nome + horário. Ao salvar escolhe **só este
-  evento** ou **todos os dias dessa agenda**. Evento em andamento ou já passado:
-  o horário fica bloqueado (nome ainda pode).
-- **Cancelar** (botão no popover, com confirmação): evento de agenda vira
-  `status = 'skipped'` (dá pra **retomar** depois); evento avulso é apagado.
-- **Excluir** um evento já cancelado: apaga de vez (com confirmação).
+- **Create** an ad-hoc event: click a time on the calendar. On collision, the
+  day's following events are pushed ("park and place" so the UNIQUE isn't
+  violated). It gets `block.manual = 1` and locks the day.
+- **Edit** (side drawer): name + time. On save you choose **this event only** or
+  **every day of this schedule**. An ongoing or past event: the time is locked
+  (the name can still change).
+- **Cancel** (popover button, with confirmation): a schedule event becomes
+  `status = 'skipped'` (you can **restore** it later); an ad-hoc event is
+  deleted.
+- **Delete** an already-cancelled event: gone for good (with confirmation).
 
-## Pausar / saldo de foco
+## Pause / focus balance
 
-Botão "pausar" em qualquer evento em andamento (tela de Foco e popover). Não
-mexe em horário — só silencia o alarme enquanto pausado.
+The "pause" button shows on any ongoing event (Focus screen and popover). It
+doesn't touch times — it just mutes the alarm while paused.
 
-O tempo pausado **enquanto o evento atual é foco** vira um **saldo**
-(`localStorage` `pomodoro:debt:<data>`, zera por dia). Pausa curta/longa não
-conta. Botão de saldo no header; quando a agenda do dia acaba com saldo, abre um
-modal:
+Paused time **while the current event is a focus block** builds up a **balance**
+(`localStorage` `pomodoro:debt:<date>`, resets daily). Short/long breaks don't
+count. There's a balance button in the header; when the day's schedule ends with
+a balance, a modal opens:
 
-- **fazer agora** — bloco de foco começando agora;
-- **⋮** -> **adicionar ao fim do dia**, **escolher data + horário**, **zerar
-  saldo**;
-- **agora não** — mantém.
+- **fazer agora** — a focus block starting now;
+- **⋮** -> **add to the end of the day**, **pick a date + time**, **clear the
+  balance**;
+- **agora não** — keep it.
 
-## Ainda por fazer
+## To do
 
-- Botão de export/import (JSON) na UI — os comandos já existem no back
-- Toggle de autostart no login
-- Estatísticas a partir de `session_log`
+- Export/import (JSON) button in the UI — the commands already exist in the back
+- Autostart-on-login toggle
+- Statistics from `session_log`

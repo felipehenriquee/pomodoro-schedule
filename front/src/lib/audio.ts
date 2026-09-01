@@ -1,14 +1,14 @@
-// Alarme via elemento <audio> (funciona sob file:// no app empacotado,
-// diferente de fetch()+AudioContext). No Electron o autoplay ja esta
-// liberado (webPreferences.autoplayPolicy), entao nao precisa de gesto.
+// Alarm via <audio> element (works under file:// in the packaged app,
+// unlike fetch()+AudioContext). In Electron autoplay is already
+// unlocked (webPreferences.autoplayPolicy), so no user gesture is needed.
 
 import type { Boundary } from "./types";
 
-// caminho relativo ao index.html: dev -> http://localhost:1420/xxx.wav
-//                                 prod -> file://.../out/renderer/xxx.wav
+// path relative to index.html: dev  -> http://localhost:1420/xxx.wav
+//                              prod -> file://.../out/renderer/xxx.wav
 const FILES: Record<Boundary, string> = {
-  work_end: "alarm-end.wav", // toca no :50 (fim do foco)
-  work_start: "alarm-start.wav", // toca no :00 (volta ao foco)
+  work_end: "alarm-end.wav", // plays at :50 (end of focus)
+  work_start: "alarm-start.wav", // plays at :00 (back to focus)
 };
 
 const els = new Map<Boundary, HTMLAudioElement>();
@@ -24,7 +24,7 @@ export async function unlockAudio(): Promise<void> {
     els.set(key, a);
   }
 
-  // "aquece": toca mudo e para, pra o 1o play real ser instantaneo
+  // "warm up": play muted and stop, so the first real play is instant
   await Promise.all(
     [...els.values()].map(async (a) => {
       try {
@@ -33,7 +33,7 @@ export async function unlockAudio(): Promise<void> {
         a.pause();
         a.currentTime = 0;
       } catch {
-        /* autoplayPolicy cobre; ignora se falhar */
+        /* autoplayPolicy covers it; ignore if it fails */
       } finally {
         a.muted = false;
       }

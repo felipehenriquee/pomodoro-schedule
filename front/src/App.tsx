@@ -22,7 +22,7 @@ function loadDebt(): number {
   }
 }
 
-/** preferencia salva; default ligado */
+/** saved preference; on by default */
 function loadSoundPref(): boolean {
   try {
     return localStorage.getItem(SOUND_KEY) !== "0";
@@ -44,18 +44,18 @@ export default function App() {
   const [range, setRange] = useState(() => weekRange());
   const { blocks, error, reload } = useBlocks(range.from, range.to);
 
-  // navegacao do calendario -> materializa/carrega a faixa visivel
+  // calendar navigation -> materializes/loads the visible range
   const onRangeChange = useCallback((from: string, to: string) => {
     setRange((r) => (r.from === from && r.to === to ? r : { from, to }));
   }, []);
   const [current, setCurrent] = useState<CurrentBlock | null>(null);
 
-  // otimista: assume a preferencia salva; o unlock no mount confirma/corrige
+  // optimistic: assume the saved preference; the unlock on mount confirms/corrects
   const [soundOn, setSoundOn] = useState(() => isDesktop && loadSoundPref());
   const [paused, setPaused] = useState(false);
   const [promptOpen, setPromptOpen] = useState(false);
 
-  // saldo de foco pausado (ms), por dia, persistido no localStorage
+  // paused-focus balance (ms), per day, persisted in localStorage
   const [debtMs, setDebtMs] = useState<number>(loadDebt);
   const [recoverOpen, setRecoverOpen] = useState(false);
   const pauseStartRef = useRef<number | null>(null);
@@ -99,7 +99,7 @@ export default function App() {
     };
   }, [refreshCurrent]);
 
-  // Alarme nas bordas de bloco
+  // Alarm on block boundaries
   useEffect(() => {
     if (!isDesktop) return;
     return api.onBlockBoundary((p) => {
@@ -109,7 +109,7 @@ export default function App() {
     });
   }, [refreshCurrent]);
 
-  // Novo evento -> pede pra ativar o som se estiver off
+  // New event -> prompt to turn the sound on if it is off
   const prevBlockId = useRef<number | null | undefined>(undefined);
   useEffect(() => {
     const id = current?.current?.id ?? null;
@@ -124,7 +124,7 @@ export default function App() {
     }
   }, [current]);
 
-  // Fim da agenda do dia (nada em andamento, nada a seguir) + saldo pendente
+  // End of the day's schedule (nothing ongoing, nothing next) + pending balance
   const hadCurrentRef = useRef(false);
   useEffect(() => {
     const has = !!current?.current;
@@ -155,8 +155,8 @@ export default function App() {
     }
   }, [enableSound]);
 
-  // Ao abrir: se a preferencia e "ligado", tenta destravar o audio sozinho
-  // (no Electron o autoplay esta liberado via webPreferences.autoplayPolicy)
+  // On open: if the preference is "on", try to unlock audio automatically
+  // (in Electron autoplay is unlocked via webPreferences.autoplayPolicy)
   useEffect(() => {
     if (!isDesktop || !loadSoundPref()) return;
     unlockAudio()
@@ -166,15 +166,15 @@ export default function App() {
 
   const togglePause = useCallback(() => {
     if (pausedRef.current) {
-      setPaused(false); // o cleanup do efeito abaixo faz o acerto final do saldo
+      setPaused(false); // the effect cleanup below does the final balance settle
     } else {
       pauseStartRef.current = Date.now();
       setPaused(true);
     }
   }, []);
 
-  // Enquanto pausado, acumula o tempo no saldo -- mas SO conta enquanto o
-  // evento atual for foco. Pausa curta/longa nao entra no saldo.
+  // While paused, accrue time into the balance -- but ONLY while the current
+  // event is a focus block. Short/long breaks don't count.
   useEffect(() => {
     if (!paused) return;
     const accrue = (stop: boolean) => {
@@ -190,7 +190,7 @@ export default function App() {
     };
   }, [paused]);
 
-  // Cria um bloco de foco "Recuperação" (duração = saldo) começando em `start`.
+  // Creates a "Recuperação" focus block (duration = balance) starting at `start`.
   const createRecovery = useCallback(
     async (date: string, start: Date) => {
       if (debtMs < 1000) {
@@ -216,7 +216,7 @@ export default function App() {
     [debtMs, reload]
   );
 
-  // Fim do dia `d`: logo após o último evento; se o dia estiver vazio, 18:00.
+  // End of day `d`: right after the last event; if the day is empty, 18:00.
   const endOfDayStart = useCallback(async (d: string): Promise<Date> => {
     let latest: number | null = null;
     try {
