@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { EventCreateForm, type EventFormValues } from "./EventCreateForm";
+import { Modal } from "../Modal";
 import { blockService } from "../../services";
 import { isoDate, localRfc3339 } from "../../lib/time";
 
@@ -48,31 +49,22 @@ export function EventCreateModal({ date, onClose, onCreated }: Props) {
   }
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal modal-form" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-head">
-          <h3>Novo evento</h3>
-          <button className="modal-close" onClick={onClose} title="Fechar">
-            {"✕"}
+    <Modal title="Novo evento" size="md" onClose={onClose}>
+      {notice ? (
+        <div className="tpl-form">
+          <p className="form-msg">{notice}</p>
+          <button className="chip solid" onClick={onClose}>
+            ok
           </button>
         </div>
-
-        {notice ? (
-          <div className="tpl-form">
-            <p className="form-msg">{notice}</p>
-            <button className="chip solid" onClick={onClose}>
-              ok
-            </button>
-          </div>
-        ) : (
-          <EventCreateForm
-            date={date}
-            saving={saving}
-            error={err}
-            onSubmit={handleSubmit}
-          />
-        )}
-      </div>
-    </div>
+      ) : (
+        <EventCreateForm
+          date={date}
+          saving={saving}
+          error={err}
+          onSubmit={handleSubmit}
+        />
+      )}
+    </Modal>
   );
 }
