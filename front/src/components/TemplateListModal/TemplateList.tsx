@@ -5,11 +5,12 @@ import type { Template } from "../../models";
 type Props = {
   items: Template[];
   onEdit: (t: Template) => void;
+  onClone: (t: Template) => void;
   onRemove: (id: number) => void;
 };
 
 /** The schedule list (or the empty-state message). */
-export function TemplateList({ items, onEdit, onRemove }: Props) {
+export function TemplateList({ items, onEdit, onClone, onRemove }: Props) {
   const { t } = useTranslation();
 
   if (items.length === 0) {
@@ -23,6 +24,7 @@ export function TemplateList({ items, onEdit, onRemove }: Props) {
           key={item.id}
           template={item}
           onEdit={() => onEdit(item)}
+          onClone={() => onClone(item)}
           onRemove={() => onRemove(item.id)}
         />
       ))}

@@ -9,10 +9,17 @@ type Props = {
   open: boolean;
   onClose: () => void;
   onEdit: (t: Template) => void;
+  onClone: (t: Template) => void;
   onChanged: () => void;
 };
 
-export function TemplateListModal({ open, onClose, onEdit, onChanged }: Props) {
+export function TemplateListModal({
+  open,
+  onClose,
+  onEdit,
+  onClone,
+  onChanged,
+}: Props) {
   const { t } = useTranslation();
   const [items, setItems] = useState<Template[]>([]);
   const [err, setErr] = useState<string | null>(null);
@@ -43,7 +50,12 @@ export function TemplateListModal({ open, onClose, onEdit, onChanged }: Props) {
   return (
     <Modal open={open} title={t("templateList.title")} size="md" onClose={onClose}>
       {err && <p className="warn">{err}</p>}
-      <TemplateList items={items} onEdit={onEdit} onRemove={remove} />
+      <TemplateList
+        items={items}
+        onEdit={onEdit}
+        onClone={onClone}
+        onRemove={remove}
+      />
     </Modal>
   );
 }

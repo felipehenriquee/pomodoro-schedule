@@ -126,9 +126,13 @@ export function AgendaView({
       <TemplateListModal
         open={listOpen}
         onClose={() => setListOpen(false)}
-        onEdit={(t) => {
+        onEdit={(tpl) => {
           setListOpen(false);
-          setTplForm({ open: true, initial: templateService.toInput(t) });
+          setTplForm({ open: true, initial: templateService.toInput(tpl) });
+        }}
+        onClone={(tpl) => {
+          setListOpen(false);
+          setTplForm({ open: true, initial: templateService.toClone(tpl) });
         }}
         onChanged={onReload}
       />

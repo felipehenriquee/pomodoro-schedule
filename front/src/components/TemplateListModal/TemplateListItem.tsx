@@ -7,11 +7,17 @@ import type { Template } from "../../models";
 type Props = {
   template: Template;
   onEdit: () => void;
+  onClone: () => void;
   onRemove: () => void;
 };
 
-/** One row in the schedule list: info + edit/delete, with an inline delete confirm. */
-export function TemplateListItem({ template, onEdit, onRemove }: Props) {
+/** One row in the schedule list: info + clone/edit/delete, with an inline delete confirm. */
+export function TemplateListItem({
+  template,
+  onEdit,
+  onClone,
+  onRemove,
+}: Props) {
   const { t } = useTranslation();
   const [confirming, setConfirming] = useState(false);
 
@@ -42,6 +48,13 @@ export function TemplateListItem({ template, onEdit, onRemove }: Props) {
         </div>
       ) : (
         <div className="tpl-list-actions">
+          <button
+            className="row-ico"
+            title={t("templateList.clone")}
+            onClick={onClone}
+          >
+            <Icon name="content_copy" size={18} />
+          </button>
           <button
             className="row-ico"
             title={t("templateList.edit")}

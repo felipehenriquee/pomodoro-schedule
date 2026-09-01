@@ -166,6 +166,7 @@
     "confirmDelete": "Delete?",
     "no": "no",
     "yes": "yes",
+    "clone": "Clone",
     "edit": "Edit",
     "delete": "Delete"
   },
