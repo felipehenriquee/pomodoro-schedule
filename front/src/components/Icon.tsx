@@ -1,51 +1,35 @@
-// Material Symbols icons (Google), inlined as SVG so they work offline.
-type IconName =
-  | "notifications_active"
-  | "notifications_off"
-  | "visibility"
-  | "edit"
-  | "delete"
-  | "close"
-  | "pause"
-  | "play_arrow"
-  | "more_vert"
-  | "restore"
-  | "block";
+// Material Symbols icons, compiled into the bundle at build time by
+// unplugin-icons (`~icons/material-symbols/*`). No runtime fetch, so they work
+// offline under file://. Add an icon: import it and add a line to ICONS.
+import NotificationsActive from "~icons/material-symbols/notifications-active";
+import NotificationsOff from "~icons/material-symbols/notifications-off";
+import Visibility from "~icons/material-symbols/visibility";
+import Edit from "~icons/material-symbols/edit";
+import Delete from "~icons/material-symbols/delete";
+import Close from "~icons/material-symbols/close";
+import Pause from "~icons/material-symbols/pause";
+import PlayArrow from "~icons/material-symbols/play-arrow";
+import MoreVert from "~icons/material-symbols/more-vert";
+import History from "~icons/material-symbols/history";
+import Block from "~icons/material-symbols/block";
 
-const PATHS: Record<IconName, string> = {
-  notifications_active:
-    "M7.58 4.08 6.15 2.65C3.75 4.48 2.17 7.3 2.03 10.5h2c.15-2.65 1.51-4.97 3.55-6.42zM19.97 10.5h2c-.15-3.2-1.73-6.02-4.12-7.85l-1.42 1.42c2.03 1.45 3.41 3.78 3.54 6.43zM18 11c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2v-5zm-6 11c.14 0 .27-.01.4-.04.65-.13 1.19-.58 1.44-1.18.1-.24.16-.51.16-.78h-4c0 1.1.9 2 2 2z",
-  notifications_off:
-    "M20 18.69 7.84 6.14 5.27 3.49 4 4.76l2.8 2.8v.01C6.28 8.57 6 9.74 6 11v5l-2 2v1h13.73l2 2L23 21.72 20 18.69zM12 22c1.11 0 2-.89 2-2h-4c0 1.11.89 2 2 2zm6-7.32V11c0-3.08-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5S10.5 3.17 10.5 4v.68c-.15.03-.29.08-.43.12-.1.03-.2.07-.31.11h-.01c-.01 0-.01 0-.02.01-.23.09-.46.2-.68.31 0 0-.01 0-.01.01L18 14.68z",
-  visibility:
-    "M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z",
-  edit:
-    "M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z",
-  delete:
-    "M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z",
-  close:
-    "M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z",
-  pause: "M6 19h4V5H6v14zm8-14v14h4V5h-4z",
-  play_arrow: "M8 5v14l11-7z",
-  more_vert:
-    "M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z",
-  restore:
-    "M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 1 1 2.05 4.95l-1.42 1.42A9 9 0 1 0 13 3zm-1 5v5l4.25 2.52.75-1.23-3.5-2.08V8z",
-  block:
-    "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9C4.63 15.55 4 13.85 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1C19.37 8.45 20 10.15 20 12c0 4.42-3.58 8-8 8z",
+const ICONS = {
+  notifications_active: NotificationsActive,
+  notifications_off: NotificationsOff,
+  visibility: Visibility,
+  edit: Edit,
+  delete: Delete,
+  close: Close,
+  pause: Pause,
+  play_arrow: PlayArrow,
+  more_vert: MoreVert,
+  restore: History,
+  block: Block,
 };
 
+export type IconName = keyof typeof ICONS;
+
 export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path d={PATHS[name]} />
-    </svg>
-  );
+  const Svg = ICONS[name];
+  return <Svg width={size} height={size} aria-hidden="true" focusable="false" />;
 }
