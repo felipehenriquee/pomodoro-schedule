@@ -1,22 +1,12 @@
 import { useEffect, useState } from "react";
-import { blockService, isDesktop } from "../services";
-import { fmtDuration, fmtWhen } from "../lib/time";
-import type { Block, BlockKind, CurrentBlock } from "../models";
-import { Icon } from "./Icon";
-import { TaskList } from "./TaskList";
-
-const KIND_LABEL: Record<BlockKind, string> = {
-  work: "Pomodoro",
-  short_break: "Descanso curto",
-  long_break: "Descanso longo",
-};
-
-// used in "2o foco do dia", "3o descanso curto do dia"
-const NTH_LABEL: Record<BlockKind, string> = {
-  work: "foco",
-  short_break: "descanso curto",
-  long_break: "descanso longo",
-};
+import { blockService, isDesktop } from "../../services";
+import { fmtDuration } from "../../lib/time";
+import { Icon } from "../Icon";
+import { FocusHeader } from "./FocusHeader";
+import { UpcomingPanel } from "./UpcomingPanel";
+import { CurrentPanel } from "./CurrentPanel";
+import { KIND_LABEL, NTH_LABEL } from "./labels";
+import type { Block, BlockKind, CurrentBlock } from "../../models";
 
 const MODES: BlockKind[] = ["work", "short_break", "long_break"];
 
@@ -81,18 +71,11 @@ export function FocusView({
 
   return (
     <div className="focus" data-kind={bgKind}>
-      <header className="focus-header">
-        <h1>Pomodoro</h1>
-        <div className="focus-actions">
-          <button className="ghost" onClick={onToggleSound}>
-            <Icon name={soundOn ? "notifications_active" : "notifications_off"} />
-            {soundOn ? "som ligado" : "ativar som"}
-          </button>
-          <button className="ghost" onClick={onOpenAgenda}>
-            ver agenda
-          </button>
-        </div>
-      </header>
+      <FocusHeader
+        soundOn={soundOn}
+        onToggleSound={onToggleSound}
+        onOpenAgenda={onOpenAgenda}
+      />
 
       <div className="focus-main">
         <div className="focus-card">
@@ -122,41 +105,9 @@ export function FocusView({
         </div>
 
         {showUpcoming && picked !== null ? (
-          <>
-            <div className="event-meta">
-              <div className="event-number">
-                {upcoming
-                  ? `em breve · ${upcoming.seq ?? 1}º ${NTH_LABEL[picked]} do dia`
-                  : `sem ${NTH_LABEL[picked]} restante`}
-              </div>
-              <div className="event-name">
-                {upcoming ? upcoming.label ?? KIND_LABEL[picked] : "—"}
-              </div>
-              {upcoming && (
-                <div className="event-when">{fmtWhen(upcoming.start_ts)}</div>
-              )}
-            </div>
-
-            {picked === "work" && upcoming && (
-              <TaskList
-                dayAgendaId={upcoming.day_agenda_id}
-                seq={upcoming.seq ?? 1}
-              />
-            )}
-          </>
+          <UpcomingPanel picked={picked} upcoming={upcoming} />
         ) : (
-          <>
-            <div className="event-meta">
-              <div className="event-number">{metaText}</div>
-              <div className="event-name">
-                {cur ? cur.label ?? KIND_LABEL[cur.kind] : "sem evento agora"}
-              </div>
-            </div>
-
-            {cur && cur.kind === "work" && (
-              <TaskList dayAgendaId={cur.day_agenda_id} seq={cur.seq ?? 1} />
-            )}
-          </>
+          <CurrentPanel cur={cur} metaText={metaText} />
         )}
       </div>
     </div>
