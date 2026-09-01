@@ -6,7 +6,7 @@
   "homepage": "https://example.com/pomodoro",
   "main": "./out/main/index.js",
   "scripts": {
-    "dev": "concurrently -k -n front,electron -c blue,magenta \"npm --prefix ../front run dev\" \"electron-vite dev\"",
+    "dev": "concurrently -k -n front,electron -c blue,magenta \"npm --prefix ../front run dev\" \"env -u LD_LIBRARY_PATH electron-vite dev\"",
     "build": "npm --prefix ../front run build && electron-vite build && node scripts/copy-renderer.mjs",
     "package": "npm run build && electron-builder",
     "start": "electron-vite preview",
