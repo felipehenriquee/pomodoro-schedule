@@ -5,15 +5,20 @@ import { TasksHead } from "./TasksHead";
 import { TaskForm } from "./TaskForm";
 import { TaskRow } from "./TaskRow";
 
-export function TaskList({
-  dayAgendaId,
-  seq,
-}: {
+type Props = {
   dayAgendaId: number;
   seq: number;
-}) {
+  /** When set, rows offer "propagate to every focus at this position". */
+  templateId?: number;
+};
+
+export function TaskList({ dayAgendaId, seq, templateId }: Props) {
   const { t } = useTranslation();
-  const { tasks, add, update, toggle, remove } = useTasks(dayAgendaId, seq);
+  const { tasks, add, update, toggle, remove, propagate } = useTasks(
+    dayAgendaId,
+    seq,
+    templateId
+  );
   const [open, setOpen] = useState(false);
 
   async function handleAdd(text: string) {
@@ -29,13 +34,16 @@ export function TaskList({
 
       {tasks.length > 0 ? (
         <ul>
-          {tasks.map((t) => (
+          {tasks.map((task) => (
             <TaskRow
-              key={t.id}
-              task={t}
-              onToggle={(done) => toggle(t.id, done)}
-              onSave={(txt) => update(t.id, txt)}
-              onRemove={() => remove(t.id)}
+              key={task.id}
+              task={task}
+              onToggle={(done) => toggle(task.id, done)}
+              onSave={(txt) => update(task.id, txt)}
+              onRemove={() => remove(task.id)}
+              onPropagate={
+                propagate ? () => propagate(task.text) : undefined
+              }
             />
           ))}
         </ul>

@@ -108,7 +108,8 @@
     "addToChecklist": "adicionar à checklist",
     "edit": "editar",
     "remove": "remover",
-    "save": "salvar"
+    "save": "salvar",
+    "propagate": "aplicar a este foco em todos os dias desta agenda"
   },
   "templateForm": {
     "name": "Nome",

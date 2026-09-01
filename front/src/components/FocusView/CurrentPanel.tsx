@@ -26,7 +26,11 @@ export function CurrentPanel({ cur, metaText }: Props) {
       </div>
 
       {cur && cur.kind === "work" && (
-        <TaskList dayAgendaId={cur.day_agenda_id} seq={cur.seq ?? 1} />
+        <TaskList
+          dayAgendaId={cur.day_agenda_id}
+          seq={cur.seq ?? 1}
+          templateId={cur.manual ? undefined : cur.template_id}
+        />
       )}
     </>
   );

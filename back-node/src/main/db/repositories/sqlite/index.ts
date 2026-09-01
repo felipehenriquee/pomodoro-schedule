@@ -475,6 +475,33 @@ class SqliteTaskRepo implements TaskRepo {
     );
   }
 
+  addForTemplate(
+    templateId: number,
+    seq: number,
+    text: string,
+    fromDate: string
+  ): number {
+    return this.db
+      .prepare(
+        `INSERT INTO task (day_agenda_id, seq, text)
+         SELECT da.id, @seq, @text
+         FROM day_agenda da
+         WHERE da.template_id = @tpl
+           AND da.date >= @from
+           AND EXISTS (
+             SELECT 1 FROM block b
+             WHERE b.day_agenda_id = da.id
+               AND b.kind = 'work' AND b.seq = @seq
+               AND b.status <> 'skipped'
+           )
+           AND NOT EXISTS (
+             SELECT 1 FROM task t
+             WHERE t.day_agenda_id = da.id AND t.seq = @seq AND t.text = @text
+           )`
+      )
+      .run({ seq, text, tpl: templateId, from: fromDate }).changes;
+  }
+
   removeForTemplate(templateId: number): void {
     this.db
       .prepare(

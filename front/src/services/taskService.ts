@@ -6,6 +6,12 @@ export const taskService = {
     api.listTasks(dayAgendaId, seq),
   add: (dayAgendaId: number, seq: number, text: string): Promise<number> =>
     api.addTask(dayAgendaId, seq, text),
+  /** Copy a task to the same focus position on every day of the template. */
+  addForTemplate: (
+    templateId: number,
+    seq: number,
+    text: string
+  ): Promise<number> => api.addTaskForTemplate(templateId, seq, text),
   update: (id: number, text: string): Promise<void> => api.updateTask(id, text),
   setDone: (id: number, done: boolean): Promise<void> =>
     api.setTaskDone(id, done),

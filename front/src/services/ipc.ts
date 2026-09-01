@@ -35,6 +35,11 @@ export interface PomodoroApi {
   importData(json: string): Promise<void>;
   listTasks(dayAgendaId: number, seq: number): Promise<Task[]>;
   addTask(dayAgendaId: number, seq: number, text: string): Promise<number>;
+  addTaskForTemplate(
+    templateId: number,
+    seq: number,
+    text: string
+  ): Promise<number>;
   updateTask(id: number, text: string): Promise<void>;
   setTaskDone(id: number, done: boolean): Promise<void>;
   deleteTask(id: number): Promise<void>;
@@ -70,6 +75,8 @@ const tauriApi: PomodoroApi = {
     invoke<Task[]>("list_tasks", { dayAgendaId, seq }),
   addTask: (dayAgendaId, seq, text) =>
     invoke<number>("add_task", { dayAgendaId, seq, text }),
+  addTaskForTemplate: (templateId, seq, text) =>
+    invoke<number>("add_task_for_template", { templateId, seq, text }),
   updateTask: (id, text) => invoke<void>("update_task", { id, text }),
   setTaskDone: (id, done) => invoke<void>("set_task_done", { id, done }),
   deleteTask: (id) => invoke<void>("delete_task", { id }),

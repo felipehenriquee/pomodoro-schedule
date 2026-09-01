@@ -14,6 +14,7 @@ export const CH = {
   blocksDeleteCancelled: "blocks:deleteCancelled",
   tasksList: "tasks:list",
   tasksAdd: "tasks:add",
+  tasksAddForTemplate: "tasks:addForTemplate",
   tasksUpdate: "tasks:update",
   tasksSetDone: "tasks:setDone",
   tasksDelete: "tasks:delete",

@@ -121,6 +121,17 @@ export interface TaskRepo {
   /** tasks of a focus event (day + seq position) */
   list(dayAgendaId: number, seq: number): Task[];
   add(dayAgendaId: number, seq: number, text: string): number;
+  /**
+   * Copy a task to the same focus position on every day of the template, from
+   * `fromDate` on -- only where that focus exists and the text isn't already
+   * there. Returns how many rows were inserted.
+   */
+  addForTemplate(
+    templateId: number,
+    seq: number,
+    text: string,
+    fromDate: string
+  ): number;
   update(id: number, text: string): void;
   setDone(id: number, done: boolean): void;
   remove(id: number): void;

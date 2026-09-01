@@ -8,10 +8,17 @@ type Props = {
   onToggle: (done: boolean) => void;
   onSave: (text: string) => void;
   onRemove: () => void;
+  onPropagate?: () => void | Promise<void>;
 };
 
 /** One checklist row: toggles between the read view and the edit view. */
-export function TaskRow({ task, onToggle, onSave, onRemove }: Props) {
+export function TaskRow({
+  task,
+  onToggle,
+  onSave,
+  onRemove,
+  onPropagate,
+}: Props) {
   const [editing, setEditing] = useState(false);
 
   if (editing) {
@@ -33,6 +40,7 @@ export function TaskRow({ task, onToggle, onSave, onRemove }: Props) {
       onToggle={onToggle}
       onEdit={() => setEditing(true)}
       onRemove={onRemove}
+      onPropagate={onPropagate}
     />
   );
 }

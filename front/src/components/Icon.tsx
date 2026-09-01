@@ -13,6 +13,7 @@ import MoreVert from "~icons/material-symbols/more-vert";
 import History from "~icons/material-symbols/history";
 import Block from "~icons/material-symbols/block";
 import Translate from "~icons/material-symbols/translate";
+import ContentCopy from "~icons/material-symbols/content-copy";
 
 const ICONS = {
   notifications_active: NotificationsActive,
@@ -27,6 +28,7 @@ const ICONS = {
   restore: History,
   block: Block,
   translate: Translate,
+  content_copy: ContentCopy,
 };
 
 export type IconName = keyof typeof ICONS;

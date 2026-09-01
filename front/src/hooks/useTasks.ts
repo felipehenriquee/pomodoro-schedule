@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { taskService, isDesktop } from "../services";
 import type { Task } from "../models";
 
-export function useTasks(dayAgendaId: number, seq: number) {
+export function useTasks(dayAgendaId: number, seq: number, templateId?: number) {
   const [tasks, setTasks] = useState<Task[]>([]);
 
   const reload = useCallback(async () => {
@@ -25,6 +25,16 @@ export function useTasks(dayAgendaId: number, seq: number) {
       await reload();
     },
     [dayAgendaId, seq, reload]
+  );
+
+  /** Copy a task to this same focus position on every day of the schedule. */
+  const propagate = useCallback(
+    async (text: string) => {
+      if (!templateId || !text.trim()) return;
+      await taskService.addForTemplate(templateId, seq, text.trim());
+      await reload();
+    },
+    [templateId, seq, reload]
   );
 
   const update = useCallback(
@@ -52,5 +62,13 @@ export function useTasks(dayAgendaId: number, seq: number) {
     [reload]
   );
 
-  return { tasks, reload, add, update, toggle, remove };
+  return {
+    tasks,
+    reload,
+    add,
+    update,
+    toggle,
+    remove,
+    propagate: templateId ? propagate : undefined,
+  };
 }

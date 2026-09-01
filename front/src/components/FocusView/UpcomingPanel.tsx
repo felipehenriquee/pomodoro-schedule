@@ -37,7 +37,11 @@ export function UpcomingPanel({ picked, upcoming }: Props) {
       </div>
 
       {picked === "work" && upcoming && (
-        <TaskList dayAgendaId={upcoming.day_agenda_id} seq={upcoming.seq ?? 1} />
+        <TaskList
+          dayAgendaId={upcoming.day_agenda_id}
+          seq={upcoming.seq ?? 1}
+          templateId={upcoming.manual ? undefined : upcoming.template_id}
+        />
       )}
     </>
   );

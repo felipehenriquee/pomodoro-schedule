@@ -2,6 +2,7 @@ import { ipcMain } from "electron";
 import { CH } from "../channels";
 import { getContext } from "./services/context";
 import * as svc from "./services/agenda";
+import { dateStr } from "./util/time";
 import type { BlockCreate, BlockEdit, TemplateInput } from "./types";
 
 export function registerIpc(): void {
@@ -48,6 +49,19 @@ export function registerIpc(): void {
       const t = String(text).trim();
       if (!t) throw new Error("tarefa vazia");
       return getContext().repos.tasks.add(dayAgendaId, seq, t);
+    }
+  );
+  ipcMain.handle(
+    CH.tasksAddForTemplate,
+    (_e, templateId: number, seq: number, text: string) => {
+      const t = String(text).trim();
+      if (!t) throw new Error("tarefa vazia");
+      return getContext().repos.tasks.addForTemplate(
+        templateId,
+        seq,
+        t,
+        dateStr()
+      );
     }
   );
   ipcMain.handle(CH.tasksUpdate, (_e, id: number, text: string) => {

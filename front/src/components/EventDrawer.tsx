@@ -171,6 +171,7 @@ export function EventDrawer({ block, readOnly = false, onClose, onSaved }: Props
               <TaskList
                 dayAgendaId={block.day_agenda_id}
                 seq={block.seq ?? 1}
+                templateId={block.manual ? undefined : block.template_id}
               />
             </>
           )}

@@ -41,6 +41,12 @@ const api = {
     ipcRenderer.invoke(CH.tasksList, dayAgendaId, seq),
   addTask: (dayAgendaId: number, seq: number, text: string): Promise<number> =>
     ipcRenderer.invoke(CH.tasksAdd, dayAgendaId, seq, text),
+  addTaskForTemplate: (
+    templateId: number,
+    seq: number,
+    text: string
+  ): Promise<number> =>
+    ipcRenderer.invoke(CH.tasksAddForTemplate, templateId, seq, text),
   updateTask: (id: number, text: string): Promise<void> =>
     ipcRenderer.invoke(CH.tasksUpdate, id, text),
   setTaskDone: (id: number, done: boolean): Promise<void> =>
