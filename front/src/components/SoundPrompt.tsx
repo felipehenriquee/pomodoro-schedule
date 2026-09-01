@@ -9,11 +9,11 @@ export function SoundPrompt({ open, onActivate, onDismiss }: Props) {
   return (
     <div className="modal-overlay" onClick={onDismiss}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h3>Um novo evento comecou</h3>
-        <p>O som do alarme esta desativado. Quer ativar agora?</p>
+        <h3>Um novo evento começou</h3>
+        <p>O som do alarme está desativado. Quer ativar agora?</p>
         <div className="modal-actions">
           <button className="chip" onClick={onDismiss}>
-            agora nao
+            agora não
           </button>
           <button className="chip solid" onClick={onActivate}>
             ativar som
