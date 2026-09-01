@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import type { BlockKind, CurrentBlock } from "../lib/types";
+import type { BlockKind, CurrentBlock } from "../models";
 
 const LABELS: Record<BlockKind, string> = {
   work: "Foco",

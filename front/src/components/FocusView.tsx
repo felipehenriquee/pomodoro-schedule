@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { api, isDesktop } from "../lib/ipc";
+import { blockService, isDesktop } from "../services";
 import { fmtDuration, fmtWhen } from "../lib/time";
-import type { Block, BlockKind, CurrentBlock } from "../lib/types";
+import type { Block, BlockKind, CurrentBlock } from "../models";
 import { Icon } from "./Icon";
 import { TaskList } from "./TaskList";
 
@@ -62,7 +62,7 @@ export function FocusView({
       return;
     }
     let alive = true;
-    api
+    blockService
       .nextOfKind(picked)
       .then((b) => alive && setUpcoming(b))
       .catch(() => alive && setUpcoming(null));

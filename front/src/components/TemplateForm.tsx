@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { Icon } from "./Icon";
-import { api } from "../lib/ipc";
+import { templateService } from "../services";
 import { isoDate } from "../lib/time";
-import type { Freq, LongBreakInput, TemplateInput, Weekday } from "../lib/types";
+import type { Freq, LongBreakInput, TemplateInput, Weekday } from "../models";
 
 const WEEKDAYS: { key: Weekday; label: string }[] = [
   { key: "MO", label: "Seg" },
@@ -93,7 +93,7 @@ export function TemplateForm({ onSaved, initial }: FormProps) {
     setSaving(true);
     setMsg(null);
     try {
-      await api.saveTemplate(form);
+      await templateService.save(form);
       setMsg(
         editing
           ? "Agenda atualizada. Eventos futuros regenerados."

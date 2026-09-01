@@ -2,7 +2,7 @@
 // unlike fetch()+AudioContext). In Electron autoplay is already
 // unlocked (webPreferences.autoplayPolicy), so no user gesture is needed.
 
-import type { Boundary } from "./types";
+import type { Boundary } from "../models";
 
 // path relative to index.html: dev  -> http://localhost:1420/xxx.wav
 //                              prod -> file://.../out/renderer/xxx.wav

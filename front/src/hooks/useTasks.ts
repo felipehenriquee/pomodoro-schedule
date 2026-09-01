@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { api, isDesktop } from "../lib/ipc";
-import type { Task } from "../lib/types";
+import { taskService, isDesktop } from "../services";
+import type { Task } from "../models";
 
 export function useTasks(dayAgendaId: number, seq: number) {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -8,7 +8,7 @@ export function useTasks(dayAgendaId: number, seq: number) {
   const reload = useCallback(async () => {
     if (!isDesktop) return;
     try {
-      setTasks(await api.listTasks(dayAgendaId, seq));
+      setTasks(await taskService.list(dayAgendaId, seq));
     } catch {
       /* ignore */
     }
@@ -21,7 +21,7 @@ export function useTasks(dayAgendaId: number, seq: number) {
   const add = useCallback(
     async (text: string) => {
       if (!text.trim()) return;
-      await api.addTask(dayAgendaId, seq, text.trim());
+      await taskService.add(dayAgendaId, seq, text.trim());
       await reload();
     },
     [dayAgendaId, seq, reload]
@@ -30,7 +30,7 @@ export function useTasks(dayAgendaId: number, seq: number) {
   const update = useCallback(
     async (id: number, text: string) => {
       if (!text.trim()) return;
-      await api.updateTask(id, text.trim());
+      await taskService.update(id, text.trim());
       await reload();
     },
     [reload]
@@ -38,7 +38,7 @@ export function useTasks(dayAgendaId: number, seq: number) {
 
   const toggle = useCallback(
     async (id: number, done: boolean) => {
-      await api.setTaskDone(id, done);
+      await taskService.setDone(id, done);
       await reload();
     },
     [reload]
@@ -46,7 +46,7 @@ export function useTasks(dayAgendaId: number, seq: number) {
 
   const remove = useCallback(
     async (id: number) => {
-      await api.deleteTask(id);
+      await taskService.remove(id);
       await reload();
     },
     [reload]

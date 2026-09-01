@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTasks } from "../hooks/useTasks";
 import { Icon } from "./Icon";
-import type { Task } from "../lib/types";
+import type { Task } from "../models";
 
 export function TaskList({
   dayAgendaId,

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { Icon } from "./Icon";
-import { api } from "../lib/ipc";
+import { templateService } from "../services";
 import { freqLabel } from "../lib/time";
-import type { Template } from "../lib/types";
+import type { Template } from "../models";
 
 type Props = {
   open: boolean;
@@ -19,7 +19,7 @@ export function TemplateListModal({ open, onClose, onEdit, onChanged }: Props) {
   const load = useCallback(async () => {
     setErr(null);
     try {
-      setItems(await api.listTemplates());
+      setItems(await templateService.list());
     } catch (e) {
       setErr(String(e));
     }
@@ -36,7 +36,7 @@ export function TemplateListModal({ open, onClose, onEdit, onChanged }: Props) {
 
   async function remove(id: number) {
     try {
-      await api.deleteTemplate(id);
+      await templateService.remove(id);
       setConfirmId(null);
       await load();
       onChanged();

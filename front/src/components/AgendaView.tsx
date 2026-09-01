@@ -8,9 +8,9 @@ import { Icon } from "./Icon";
 import { TemplateListModal } from "./TemplateListModal";
 import { TemplateModal } from "./TemplateModal";
 import { TimerHud } from "./TimerHud";
-import { api, isDesktop } from "../lib/ipc";
+import { blockService, isDesktop, templateService } from "../services";
 import { fmtDuration } from "../lib/time";
-import type { Block, CurrentBlock, Template, TemplateInput } from "../lib/types";
+import type { Block, CurrentBlock, TemplateInput } from "../models";
 
 type Props = {
   blocks: Block[];
@@ -29,29 +29,6 @@ type Props = {
 
 type Pop = { block: Block; x: number; y: number };
 type TplForm = { open: boolean; initial?: TemplateInput };
-
-function toInput(t: Template): TemplateInput {
-  return {
-    id: t.id,
-    name: t.name,
-    days_of_week: t.days_of_week,
-    start_time: t.start_time,
-    end_time: t.end_time,
-    work_min: t.work_min,
-    short_break_min: t.short_break_min,
-    active: t.active,
-    freq: t.freq,
-    anchor_date: t.anchor_date,
-    interval_days: t.interval_days,
-    valid_from: t.valid_from,
-    valid_until: t.valid_until,
-    long_breaks: t.long_breaks.map((b) => ({
-      start_time: b.start_time,
-      end_time: b.end_time,
-      label: b.label,
-    })),
-  };
-}
 
 export function AgendaView({
   blocks,
@@ -90,14 +67,14 @@ export function AgendaView({
 
   async function confirmDelete() {
     if (!confirmBlock) return;
-    await api.deleteBlock(confirmBlock.id);
+    await blockService.remove(confirmBlock.id);
     setConfirmBlock(null);
     onReload();
   }
 
   async function restore(block: Block) {
     setPop(null);
-    await api.setBlockStatus(block.id, "pending");
+    await blockService.restore(block.id);
     onReload();
   }
 
@@ -210,7 +187,7 @@ export function AgendaView({
         onClose={() => setListOpen(false)}
         onEdit={(t) => {
           setListOpen(false);
-          setTplForm({ open: true, initial: toInput(t) });
+          setTplForm({ open: true, initial: templateService.toInput(t) });
         }}
         onChanged={onReload}
       />
@@ -280,7 +257,7 @@ export function AgendaView({
         message="Apaga de vez todos os eventos marcados como cancelados. Não dá pra desfazer."
         confirmLabel="excluir todos"
         onConfirm={async () => {
-          await api.deleteCancelled();
+          await blockService.clearCancelled();
           setConfirmClear(false);
           onReload();
         }}

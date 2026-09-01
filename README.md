@@ -57,6 +57,18 @@ Database: `~/.config/Pomodoro/pomodoro.sqlite` (Linux) /
 installs no database at all. Schema applied via `user_version`
 (`src/main/db/schema.ts` + migrations in `db/index.ts`).
 
+## front architecture
+
+| Piece | Where |
+|---|---|
+| Domain models (types split by domain) | `src/models/` — `common`, `template`, `block`, `task` (+ barrel `index.ts`) |
+| Transport gateway | `src/services/ipc.ts` — one `PomodoroApi` object that resolves to Electron (`window.api`) or Tauri (`invoke`/`listen`) |
+| Domain services | `src/services/` — `templateService`, `blockService`, `taskService` wrap the gateway and hold front-side logic (e.g. `toTemplateInput`) |
+| React state hooks | `src/hooks/` — `useBlocks`, `useTasks` |
+| UI | `src/components/` (calendar, focus view, modals) + `src/App.tsx` |
+
+Components and hooks call the services, never the gateway directly.
+
 ## How the alarm works
 
 The `scheduler` (main process) sleeps until the next block boundary. When it

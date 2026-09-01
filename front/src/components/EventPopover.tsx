@@ -1,6 +1,6 @@
 import { Icon } from "./Icon";
 import { fmtFullDate, fmtHM, freqLabel } from "../lib/time";
-import type { Block, BlockKind } from "../lib/types";
+import type { Block, BlockKind } from "../models";
 
 const KIND_LABEL: Record<BlockKind, string> = {
   work: "Foco",

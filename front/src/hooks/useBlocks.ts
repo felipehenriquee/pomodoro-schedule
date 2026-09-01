@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { api, isDesktop } from "../lib/ipc";
-import type { Block } from "../lib/types";
+import { blockService, isDesktop } from "../services";
+import type { Block } from "../models";
 
 /** Materializes the range and returns the blocks [from, to] ("YYYY-MM-DD" dates). */
 export function useBlocks(from: string, to: string) {
@@ -13,8 +13,8 @@ export function useBlocks(from: string, to: string) {
     setLoading(true);
     setError(null);
     try {
-      await api.materializeRange(from, to);
-      setBlocks(await api.getBlocks(from, to));
+      await blockService.materialize(from, to);
+      setBlocks(await blockService.range(from, to));
     } catch (e) {
       setError(String(e));
     } finally {

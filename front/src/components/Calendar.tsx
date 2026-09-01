@@ -2,7 +2,7 @@ import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { isoDate } from "../lib/time";
-import type { Block, BlockKind } from "../lib/types";
+import type { Block, BlockKind } from "../models";
 
 const COLORS: Record<BlockKind, string> = {
   work: "#175676", // primary

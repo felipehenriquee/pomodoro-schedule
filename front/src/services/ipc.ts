@@ -10,10 +10,14 @@ import type {
   Task,
   Template,
   TemplateInput,
-} from "./types";
+} from "../models";
 
 type Unsub = () => void;
 
+/**
+ * Low-level transport gateway. The domain services (templateService,
+ * blockService, taskService) wrap this; components should use those.
+ */
 export interface PomodoroApi {
   listTemplates(): Promise<Template[]>;
   saveTemplate(input: TemplateInput): Promise<number>;

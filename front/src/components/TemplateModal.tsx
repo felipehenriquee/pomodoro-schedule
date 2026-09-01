@@ -1,5 +1,5 @@
 import { TemplateForm } from "./TemplateForm";
-import type { TemplateInput } from "../lib/types";
+import type { TemplateInput } from "../models";
 
 type Props = {
   open: boolean;

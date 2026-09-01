@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Icon } from "./Icon";
 import { TaskList } from "./TaskList";
-import { api } from "../lib/ipc";
+import { blockService } from "../services";
 import { fmtFullDate, fmtHM, freqLabel, localRfc3339 } from "../lib/time";
-import type { Block, BlockKind } from "../lib/types";
+import type { Block, BlockKind } from "../models";
 
 const KIND_LABEL: Record<BlockKind, string> = {
   work: "Foco",
@@ -51,7 +51,7 @@ export function EventDrawer({ block, readOnly = false, onClose, onSaved }: Props
     }
     setSaving(true);
     try {
-      await api.updateBlock({
+      await blockService.update({
         id: block.id,
         label: name.trim() || null,
         start_ts: localRfc3339(s),

@@ -4,10 +4,10 @@ import { FocusView } from "./components/FocusView";
 import { RecoverPrompt } from "./components/RecoverPrompt";
 import { SoundPrompt } from "./components/SoundPrompt";
 import { useBlocks } from "./hooks/useBlocks";
-import { api, isDesktop } from "./lib/ipc";
+import { blockService, isDesktop } from "./services";
 import { playAlarm, unlockAudio } from "./lib/audio";
 import { isoDate, localRfc3339, weekRange } from "./lib/time";
-import type { BlockKind, CurrentBlock } from "./lib/types";
+import type { BlockKind, CurrentBlock } from "./models";
 
 type View = "focus" | "agenda";
 
@@ -80,7 +80,7 @@ export default function App() {
   const refreshCurrent = useCallback(async () => {
     if (!isDesktop) return;
     try {
-      setCurrent(await api.getCurrentBlock());
+      setCurrent(await blockService.current());
     } catch {
       /* ignore */
     }
@@ -102,7 +102,7 @@ export default function App() {
   // Alarm on block boundaries
   useEffect(() => {
     if (!isDesktop) return;
-    return api.onBlockBoundary((p) => {
+    return blockService.onBoundary((p) => {
       if (soundOnRef.current && !pausedRef.current) playAlarm(p.boundary);
       refreshCurrent();
       reloadRef.current();
@@ -199,7 +199,7 @@ export default function App() {
       }
       const end = new Date(start.getTime() + Math.max(60_000, debtMs));
       try {
-        await api.createBlock({
+        await blockService.create({
           date,
           kind: "work",
           label: "Recuperação",
@@ -220,8 +220,8 @@ export default function App() {
   const endOfDayStart = useCallback(async (d: string): Promise<Date> => {
     let latest: number | null = null;
     try {
-      await api.materializeRange(d, d);
-      for (const b of await api.getBlocks(d, d)) {
+      await blockService.materialize(d, d);
+      for (const b of await blockService.range(d, d)) {
         const e = new Date(b.end_ts).getTime();
         if (latest === null || e > latest) latest = e;
       }

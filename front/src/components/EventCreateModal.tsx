@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Icon } from "./Icon";
-import { api } from "../lib/ipc";
+import { blockService } from "../services";
 import { isoDate, localRfc3339 } from "../lib/time";
-import type { BlockKind } from "../lib/types";
+import type { BlockKind } from "../models";
 
 const KINDS: { key: BlockKind; label: string; min: number }[] = [
   { key: "work", label: "Foco", min: 50 },
@@ -60,7 +60,7 @@ export function EventCreateModal({ date, onClose, onCreated }: Props) {
     }
     setSaving(true);
     try {
-      const pushed = await api.createBlock({
+      const pushed = await blockService.create({
         date: isoDate(date),
         kind,
         label: name.trim() || null,
