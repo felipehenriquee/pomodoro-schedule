@@ -8,6 +8,8 @@ back-node/dist
 
 # versao de referencia em Rust/Tauri - nao versionada neste repo
 /back/
+/.claude
+/backend/
 
 # misc
 *.local

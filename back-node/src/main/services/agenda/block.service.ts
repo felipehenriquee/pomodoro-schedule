@@ -1,80 +1,18 @@
-import { generate, type DayConfig } from "../domain/blocks";
-import { occursOn } from "../domain/recurrence";
-import type {
-  Block,
-  BlockCreate,
-  BlockEdit,
-  CurrentBlock,
-  Template,
-  TemplateInput,
-} from "../types";
-import { addDays, dateStr, hhmm, localRfc3339 } from "../util/time";
-import type { AgendaContext } from "./context";
+import { generate, type DayConfig } from "../../domain/blocks";
+import { occursOn } from "../../domain/recurrence";
+import type { Block, BlockCreate, BlockEdit, CurrentBlock } from "../../types";
+import { addDays, dateStr, hhmm, localRfc3339 } from "../../util/time";
+import type { AgendaContext } from "../context";
 
 const KINDS = new Set(["work", "short_break", "long_break"]);
 
 /** How many days ahead to always keep materialized. */
 export const MATERIALIZE_AHEAD_DAYS = 120;
 
-export function listTemplates(ctx: AgendaContext): Template[] {
-  return ctx.repos.templates.list();
-}
-
-export function saveTemplate(ctx: AgendaContext, input: TemplateInput): number {
-  const today = dateStr();
-  const nowIso = localRfc3339(new Date());
-
-  const id = ctx.db.transaction(() => {
-    if (input.id == null) return ctx.repos.templates.create(input);
-
-    ctx.repos.templates.update(input.id, input);
-    const tpl = ctx.repos.templates.get(input.id)!; // already with the new config
-
-    // Every day of the schedule from TODAY on (skips hand-edited days):
-    //  - still occurs and is a FUTURE day -> delete the blocks (regenerated)
-    //  - still occurs and is TODAY -> leave it (partial history of the day)
-    //  - stopped occurring -> cancel the blocks that haven't started yet
-    //    (start_ts > now) and lock the day; what already passed stays intact
-    for (const day of ctx.repos.dayAgendas.listForTemplateFrom(input.id, today)) {
-      if (day.locked) continue;
-      const inWindow =
-        (!tpl.valid_from || day.date >= tpl.valid_from) &&
-        (!tpl.valid_until || day.date <= tpl.valid_until);
-      const occurs =
-        inWindow &&
-        occursOn(
-          day.date,
-          tpl.freq,
-          tpl.days_of_week.join(","),
-          tpl.anchor_date,
-          tpl.interval_days
-        );
-
-      if (occurs) {
-        if (day.date > today) ctx.repos.blocks.deleteForDayAgenda(day.id);
-      } else {
-        ctx.repos.blocks.markSkippedForDayAgendaAfter(day.id, nowIso);
-        ctx.repos.dayAgendas.lock(day.id);
-      }
-    }
-    return input.id;
-  })();
-
-  materialize(ctx, today, addDays(today, MATERIALIZE_AHEAD_DAYS));
-  return id;
-}
-
 /** Ensures the next N days are materialized (idempotent). */
 export function materializeAhead(ctx: AgendaContext): number {
   const today = dateStr();
   return materialize(ctx, today, addDays(today, MATERIALIZE_AHEAD_DAYS));
-}
-
-export function deleteTemplate(ctx: AgendaContext, id: number): void {
-  ctx.db.transaction(() => {
-    ctx.repos.tasks.removeForTemplate(id);
-    ctx.repos.templates.remove(id);
-  })();
 }
 
 /** Generates (idempotent) the blocks of active templates in the range [from, to]. */
@@ -350,17 +288,17 @@ export function createBlock(ctx: AgendaContext, input: BlockCreate): boolean {
   })();
 }
 
+/** Permanently deletes every cancelled event. Returns how many were removed. */
+export function deleteCancelledBlocks(ctx: AgendaContext): number {
+  return ctx.repos.blocks.deleteAllSkipped();
+}
+
 /**
  * The event's "delete" button:
  *  - ad-hoc event (manual) -> deleted for good;
  *  - schedule event -> cancelled (status 'skipped'), so it can be "restored".
  * Either way it locks the day so materialize won't regenerate it.
  */
-/** Permanently deletes every cancelled event. Returns how many were removed. */
-export function deleteCancelledBlocks(ctx: AgendaContext): number {
-  return ctx.repos.blocks.deleteAllSkipped();
-}
-
 export function deleteBlock(ctx: AgendaContext, id: number): void {
   const b = ctx.repos.blocks.get(id);
   if (!b) return;
@@ -368,52 +306,4 @@ export function deleteBlock(ctx: AgendaContext, id: number): void {
   if (b.manual || b.status === "skipped") ctx.repos.blocks.remove(id);
   else ctx.repos.blocks.setStatus(id, "skipped");
   ctx.repos.dayAgendas.lock(b.day_agenda_id);
-}
-
-// ---- export / import (JSON) ----
-
-export function exportData(ctx: AgendaContext): string {
-  const templates = ctx.repos.templates.list().map((t) => ({
-    name: t.name,
-    days_of_week: t.days_of_week,
-    start_time: t.start_time,
-    end_time: t.end_time,
-    work_min: t.work_min,
-    short_break_min: t.short_break_min,
-    active: t.active,
-    freq: t.freq,
-    anchor_date: t.anchor_date,
-    interval_days: t.interval_days,
-    valid_from: t.valid_from,
-    valid_until: t.valid_until,
-    long_breaks: t.long_breaks.map((b) => ({
-      start_time: b.start_time,
-      end_time: b.end_time,
-      label: b.label,
-    })),
-  }));
-  return JSON.stringify({ templates }, null, 2);
-}
-
-export function importData(ctx: AgendaContext, json: string): void {
-  const bundle = JSON.parse(json) as { templates: TemplateInput[] };
-  ctx.db.transaction(() => {
-    for (const t of bundle.templates ?? []) {
-      ctx.repos.templates.create({
-        name: t.name,
-        days_of_week: t.days_of_week ?? [],
-        start_time: t.start_time,
-        end_time: t.end_time,
-        work_min: t.work_min,
-        short_break_min: t.short_break_min,
-        active: t.active ?? true,
-        freq: t.freq ?? "weekly",
-        anchor_date: t.anchor_date ?? null,
-        interval_days: t.interval_days ?? null,
-        valid_from: t.valid_from ?? null,
-        valid_until: t.valid_until ?? null,
-        long_breaks: t.long_breaks ?? [],
-      });
-    }
-  })();
 }

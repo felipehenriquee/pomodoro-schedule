@@ -2,7 +2,6 @@ import { ipcMain } from "electron";
 import { CH } from "../channels";
 import { getContext } from "./services/context";
 import * as svc from "./services/agenda";
-import { dateStr } from "./util/time";
 import type { BlockCreate, BlockEdit, TemplateInput } from "./types";
 
 export function registerIpc(): void {
@@ -41,14 +40,14 @@ export function registerIpc(): void {
   );
 
   ipcMain.handle(CH.tasksList, (_e, dayAgendaId: number, seq: number) =>
-    getContext().repos.tasks.list(dayAgendaId, seq)
+    svc.listTasks(getContext(), dayAgendaId, seq)
   );
   ipcMain.handle(
     CH.tasksAdd,
     (_e, dayAgendaId: number, seq: number, text: string) => {
       const t = String(text).trim();
       if (!t) throw new Error("tarefa vazia");
-      return getContext().repos.tasks.add(dayAgendaId, seq, t);
+      return svc.addTask(getContext(), dayAgendaId, seq, t);
     }
   );
   ipcMain.handle(
@@ -56,24 +55,19 @@ export function registerIpc(): void {
     (_e, templateId: number, seq: number, text: string) => {
       const t = String(text).trim();
       if (!t) throw new Error("tarefa vazia");
-      return getContext().repos.tasks.addForTemplate(
-        templateId,
-        seq,
-        t,
-        dateStr()
-      );
+      return svc.addTaskForTemplate(getContext(), templateId, seq, t);
     }
   );
   ipcMain.handle(CH.tasksUpdate, (_e, id: number, text: string) => {
     const t = String(text).trim();
     if (!t) throw new Error("tarefa vazia");
-    getContext().repos.tasks.update(id, t);
+    return svc.updateTask(getContext(), id, t);
   });
   ipcMain.handle(CH.tasksSetDone, (_e, id: number, done: boolean) =>
-    getContext().repos.tasks.setDone(id, done)
+    svc.setTaskDone(getContext(), id, done)
   );
   ipcMain.handle(CH.tasksDelete, (_e, id: number) =>
-    getContext().repos.tasks.remove(id)
+    svc.deleteTask(getContext(), id)
   );
 
   ipcMain.handle(CH.dataExport, () => svc.exportData(getContext()));
